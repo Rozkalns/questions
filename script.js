@@ -76,7 +76,7 @@ function fetchItem(id) {
         write();
         return;
       }
-      array = text.match(/[^\r\n]+/g);
+      array = text.match(/[^\r\n]+/g).map(t => t.unquoted());
       write();
     })
     .catch(function(err){
@@ -112,11 +112,11 @@ function pickText() {
   const questions = array.diff(topics);
   const randomQuestionIndex =  Math.floor(Math.random() * questions.length)
   
-  let pickedLine = questions[randomQuestionIndex].unquoted();
+  let pickedLine = questions[randomQuestionIndex];
   if (pickedLesson === 'dialogue9') {
     pickedLine = pickedLine.replace(/\s\u2022\s/g, "\n- ");
   }
-  
+
   if (topics.length) {
     const lookupPart = array.slice(0,array.indexOf(pickedLine)).reverse();
     const topicIndex = lookupPart.findIndex(isTopicName);
