@@ -43,7 +43,7 @@ main {
 
 @media (max-width: 500px) {
   #question {
-    font-size: 2.5em;
+  font-size: 2.5em;
   }
 }
 
@@ -87,6 +87,78 @@ ul {  list-style: inside; }
 }
 .reload svg path {
   fill: #111;
+}
+
+.support {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 16px;
+}
+
+.support .btn {
+  transition: all 1s;
+}
+
+.support .btn a {
+  display: none;
+}
+
+.support .btn span {
+  display: none;
+  padding: 0 6px;
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+.btn {
+  box-sizing:border-box;
+  background: #fff;
+  height: 64px;
+  width: 64px;
+  overflow: hidden;
+}
+
+.btn.expand {
+  width: 160px;
+  height: 80px;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn.expand span {
+  margin-top: 10px;
+  display: block;
+}
+
+.btn.expand a {
+  display: block;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.btn-round {
+  border-radius: 50px;
+}
+
+.btn-bmc.expand:after {
+  width: 160px;
+  background: url("./assets/logo-bmc.svg") no-repeat 6px 2px;
+  background-size: 90% auto;
+}
+
+.btn-bmc:after {
+  content: "";
+  display: inline-block;
+  height: 58px;
+  vertical-align: bottom;
+  width: 58px;
+  background: url(./assets/logo-bmc.svg) no-repeat 5px 10px;
+  background-size: auto 85%;
 }
 
 a {

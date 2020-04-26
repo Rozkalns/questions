@@ -2,6 +2,7 @@ const converter = new showdown.Converter();
 const reloadButton = document.querySelector( '.reload' );
 const reloadSvg = document.querySelector( 'svg' );
 const question = document.getElementById('question');
+const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
 
 const mapping = {
@@ -215,8 +216,12 @@ const isTopicName = t => t.toUpperCase() === t;
 
 // Events
 fetchClass();
-reloadButton.addEventListener('click', reload);
 window.addEventListener("hashchange", fetchClass, false);
+reloadButton.addEventListener('click', reload);
+support.addEventListener('click', (el) => {
+    el.target.classList.add('expand')
+    console.log('click');
+});
 
 // Show button.
 setTimeout(function() {
