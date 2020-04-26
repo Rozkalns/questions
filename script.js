@@ -2,6 +2,7 @@ const converter = new showdown.Converter();
 const reloadButton = document.querySelector( '.reload' );
 const reloadSvg = document.querySelector( 'svg' );
 const question = document.getElementById('question');
+const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
 
 let lesson = '';
@@ -78,9 +79,17 @@ function reloadClick() {
 }
 
 function fetchClass() {
-  links.style.display = 'none';
-  question.classList.add(lesson = hash());
-  fetchItem(sheet = mapping[lesson]);
+  if (hash()) {
+    let pickedLesson = hash();
+    question.classList.add(pickedLesson || 'home');
+    fetchItem(mapping[pickedLesson]);
+
+    links.style.display = 'none';
+    links.innerHTML = '';
+  } else {
+    question.innerText = 'Questions Lake';
+    makeLinks();
+  }
 }
 
 function fetchItem(sheet) {
@@ -157,6 +166,8 @@ function makeLinks() {
       box.append(copy);
       links.append(box)
     });
+
+    links.style.display = 'block';
   }
 }
 
@@ -233,14 +244,14 @@ const copyToClipboard = str => {
 const pause = time => new Promise(resolve => setTimeout(resolve, time))
 const isTopicName = t => t.toUpperCase() === t;
 
-makeLinks();
-if (hash()) {
-  fetchClass();
-}
-
 // Events
-reloadButton.addEventListener('click', reload);
+fetchClass();
 window.addEventListener("hashchange", fetchClass, false);
+reloadButton.addEventListener('click', reload);
+support.addEventListener('click', (el) => {
+    el.target.classList.add('expand')
+    console.log('click');
+});
 
 // Show button.
 setTimeout(function() {
