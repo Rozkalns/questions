@@ -71,11 +71,17 @@ function reloadClick() {
 }
 
 function fetchClass() {
-  links.style.display = 'none';
+  if (hash()) {
+    let pickedLesson = hash();
+    question.classList.add(pickedLesson || 'home');
+    fetchItem(mapping[pickedLesson]);
 
-  let pickedLesson = hash();
-  question.classList.add(pickedLesson);
-  fetchItem(mapping[pickedLesson]);
+    links.style.display = 'none';
+    links.innerHTML = '';
+  } else {
+    question.innerText = 'Questions Lake';
+    makeLinks();
+  }
 }
 
 function fetchItem(id) {
@@ -139,6 +145,8 @@ function makeLinks() {
       box.append(copy);
       links.append(box)
     });
+
+    links.style.display = 'block';
   }
 }
 
@@ -205,12 +213,8 @@ const copyToClipboard = str => {
 const pause = time => new Promise(resolve => setTimeout(resolve, time))
 const isTopicName = t => t.toUpperCase() === t;
 
-makeLinks();
-if (hash()) {
-  fetchClass();
-}
-
 // Events
+fetchClass();
 reloadButton.addEventListener('click', reload);
 window.addEventListener("hashchange", fetchClass, false);
 
