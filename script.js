@@ -157,7 +157,7 @@ function makeLinks() {
       let box = document.createElement('div');
       box.innerHTML = `
         <a href="#${key}" class="title">${human}</a><br>
-        ${short ?? ''} 
+        ${short || ''} 
       `
 
       box.append(copy);
