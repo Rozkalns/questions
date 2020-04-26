@@ -2,6 +2,7 @@ const converter = new showdown.Converter();
 const reloadButton = document.querySelector( '.reload' );
 const reloadSvg = document.querySelector( 'svg' );
 const question = document.getElementById('question');
+const support = document.querySelector('.support .btn');
 
 const mapping = {
   'interview12': 165972876, // grade 12, 10/60
@@ -137,6 +138,10 @@ fetchItem(mapping[pickedLesson]);
 
 // Events
 reloadButton.addEventListener('click', reload);
+support.addEventListener('click', (el) => {
+    el.target.classList.add('expand')
+    console.log('click');
+});
 
 // Show button.
 setTimeout(function() {
