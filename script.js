@@ -3,6 +3,7 @@ const reloadButton = document.querySelector( '.reload' );
 const reloadSvg = document.querySelector( 'svg' );
 const question = document.getElementById('question');
 const links = document.querySelector('.links');
+let sheet = {};
 
 const mapping = {
   'interview12': {
@@ -20,6 +21,12 @@ const mapping = {
   'interview9': {
     'gid': 1311882750,
     'ejuz' : 'y2ex'
+  }, // grade 10/60
+  'words': {
+    'type': 'randomTwo',
+    'gid': 1863447477,
+    'range': 'A2:A',
+    'ejuz' : null
   }, // grade 10/60
 }
 
@@ -75,17 +82,19 @@ function fetchClass() {
 
   let pickedLesson = hash();
   question.classList.add(pickedLesson);
-  fetchItem(mapping[pickedLesson]);
+  fetchItem(sheet = mapping[pickedLesson]);
 }
 
-function fetchItem(id) {
-  if (id === null || typeof id !== 'object') {
+function fetchItem(sheet) {
+  if (sheet === null || typeof sheet !== 'object') {
     question.innerHTML = 'Izvēlies klasi...';
     return;
   }
 
-  let url = `https://docs.google.com/spreadsheets/d/1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ/export?exportFormat=csv&single=true&gid=${id.gid}`;
-  
+  let url = `https://docs.google.com/spreadsheets/d/1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ/export?exportFormat=csv&single=true`;
+  url += sheet.hasOwnProperty('gid') ? `&gid=${sheet.gid}` : '';
+  url += sheet.hasOwnProperty('range') ? `&range=${sheet.range}` : '';
+
   fetch(url).then(function(response){
       return response.text();
     })
@@ -107,7 +116,20 @@ function write() {
   if (!array.length) {
     text = 'te nekā nav...'
   } else {
-    text = pickText(); 
+    let type = 'standard';
+    if (sheet.hasOwnProperty('type')) {
+      type = sheet.type;
+    }
+
+    switch(type) {
+      case 'randomTwo':
+        text = pickRandomWords(2);
+        break;
+      case 'standard':
+      default:
+        text = pickText();
+        break;
+    }
   }
   
   question.style.opacity = 1;
@@ -119,21 +141,23 @@ function makeLinks() {
     Object.keys(mapping).forEach(function (key) {
       const item = mapping[key];
       const human = key.match(/\d+|\D+/g).map(i => i.capitalize()).join(' ');
-      const short = `https://ej.uz/${item.ejuz}`;
+      const short = item.ejuz && `https://ej.uz/${item.ejuz}`;
 
       let copy = document.createElement('span');
-      copy.innerText = '🔗';
-      copy.classList.add('copy');
+      if (short) {
+        copy.innerText = '🔗';
+        copy.classList.add('copy');
 
-      copy.addEventListener('click', (e) => {
-        copyToClipboard(short)
-        successCopy(e.target);
-      });
+        copy.addEventListener('click', (e) => {
+          copyToClipboard(short)
+          successCopy(e.target);
+        });
+      }
 
       let box = document.createElement('div');
       box.innerHTML = `
         <a href="#${key}" class="title">${human}</a><br>
-        ${short} 
+        ${short ?? ''} 
       `
 
       box.append(copy);
@@ -150,6 +174,16 @@ function qs(param) {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   return urlParams.get(param)
+}
+
+function pickRandomWords(words) {
+  const wordCount = array.length;
+  let indexes = [];
+  for (let i = 0; words > i; i++) {
+    indexes.push(Math.floor(Math.random() * wordCount));
+  }
+
+  return indexes.map(i => array[i]).join(' ');
 }
 
 function pickText() {
