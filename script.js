@@ -3,6 +3,8 @@ const reloadButton = document.querySelector( '.reload' );
 const reloadSvg = document.querySelector( 'svg' );
 const question = document.getElementById('question');
 const links = document.querySelector('.links');
+
+let lesson = '';
 let sheet = {};
 
 const mapping = {
@@ -62,10 +64,8 @@ function reload() {
 }
 
 function reloadClick() {
-  reloadEnabled = false;
   rotation -= 180;
-  
-  // Eh, this works.
+
   reloadSvg.style.webkitTransform = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
   reloadSvg.style.MozTransform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
   reloadSvg.style.transform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
@@ -74,15 +74,13 @@ function reloadClick() {
   currentPalette = currentPalette % palettes.length;
   document.body.style.background = palettes[currentPalette];
   
-  question.style.opacity = 0;
+  question.style.opacity = '0';
 }
 
 function fetchClass() {
   links.style.display = 'none';
-
-  let pickedLesson = hash();
-  question.classList.add(pickedLesson);
-  fetchItem(sheet = mapping[pickedLesson]);
+  question.classList.add(lesson = hash());
+  fetchItem(sheet = mapping[lesson]);
 }
 
 function fetchItem(sheet) {
@@ -99,10 +97,6 @@ function fetchItem(sheet) {
       return response.text();
     })
     .then(function(text){
-      if (!text.length) {
-        write();
-        return;
-      }
       array = text.match(/[^\r\n]+/g).map(t => t.unquoted());
       write();
     })
@@ -132,7 +126,7 @@ function write() {
     }
   }
   
-  question.style.opacity = 1;
+  question.style.opacity = '1';
   question.innerHTML = text;
 }
 
@@ -205,7 +199,7 @@ function pickText() {
     const topicIndex = lookupPart.findIndex(isTopicName);
     const topic = lookupPart[topicIndex];
 
-    pickedLine =  `**${topic}**<br>${pickedLine}`;
+    pickedLine =  `**${topic.trim()}**<br>${pickedLine.trim()}`;
   }
 
   return converter.makeHtml(pickedLine);
