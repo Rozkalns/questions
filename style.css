@@ -87,3 +87,31 @@ ul {  list-style: inside; }
 .reload svg path {
   fill: #111;
 }
+
+.support {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.btn {
+  background: #fff;
+  height: 64px;
+  width: 64px;
+}
+
+.btn-bmc {
+  background-image: url("./assets/logo-bmc.svg");
+  background-size: auto 70%;
+  background-repeat: no-repeat;
+  background-position-y: 50%;
+  background-position-x: -3.5%;
+}
+
+.btn img {
+  height: 100%;
+}
+
+.btn-round {
+  border-radius: 50%;
+}
