@@ -4,6 +4,8 @@ const reloadSvg = document.querySelector( 'svg' );
 const question = document.getElementById('question');
 const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
+let lesson = '';
+let sheet = {};
 
 const mapping = {
   'interview12': {
@@ -22,6 +24,12 @@ const mapping = {
     'gid': 1311882750,
     'ejuz' : 'y2ex'
   }, // grade 10/60
+  'words': {
+    'type': 'randomTwo',
+    'gid': 1863447477,
+    'range': 'A2:A',
+    'ejuz' : null
+  }, // grade 10/60
 }
 
 let array = [];
@@ -37,7 +45,6 @@ var palettes = [
 var currentPalette = 0;
 
 // Functions
-
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };
@@ -56,10 +63,8 @@ function reload() {
 }
 
 function reloadClick() {
-  reloadEnabled = false;
   rotation -= 180;
-  
-  // Eh, this works.
+
   reloadSvg.style.webkitTransform = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
   reloadSvg.style.MozTransform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
   reloadSvg.style.transform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
@@ -68,14 +73,13 @@ function reloadClick() {
   currentPalette = currentPalette % palettes.length;
   document.body.style.background = palettes[currentPalette];
   
-  question.style.opacity = 0;
+  question.style.opacity = '0';
 }
 
 function fetchClass() {
   if (hash()) {
-    let pickedLesson = hash();
-    question.classList.add(pickedLesson || 'home');
-    fetchItem(mapping[pickedLesson]);
+    question.classList.add(lesson = hash() || 'home');
+    fetchItem(sheet = mapping[lesson]);
 
     links.style.display = 'none';
     links.innerHTML = '';
@@ -85,22 +89,20 @@ function fetchClass() {
   }
 }
 
-function fetchItem(id) {
-  if (id === null || typeof id !== 'object') {
+function fetchItem(sheet) {
+  if (sheet === null || typeof sheet !== 'object') {
     question.innerHTML = 'Izvēlies klasi...';
     return;
   }
 
-  let url = `https://docs.google.com/spreadsheets/d/1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ/export?exportFormat=csv&single=true&gid=${id.gid}`;
-  
+  let url = `https://docs.google.com/spreadsheets/d/1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ/export?exportFormat=csv&single=true`;
+  url += sheet.hasOwnProperty('gid') ? `&gid=${sheet.gid}` : '';
+  url += sheet.hasOwnProperty('range') ? `&range=${sheet.range}` : '';
+
   fetch(url).then(function(response){
       return response.text();
     })
     .then(function(text){
-      if (!text.length) {
-        write();
-        return;
-      }
       array = text.match(/[^\r\n]+/g).map(t => t.unquoted());
       write();
     })
@@ -114,10 +116,23 @@ function write() {
   if (!array.length) {
     text = 'te nekā nav...'
   } else {
-    text = pickText(); 
+    let type = 'standard';
+    if (sheet.hasOwnProperty('type')) {
+      type = sheet.type;
+    }
+
+    switch(type) {
+      case 'randomTwo':
+        text = pickRandomWords(2);
+        break;
+      case 'standard':
+      default:
+        text = pickText();
+        break;
+    }
   }
   
-  question.style.opacity = 1;
+  question.style.opacity = '1';
   question.innerHTML = text;
 }
 
@@ -126,21 +141,23 @@ function makeLinks() {
     Object.keys(mapping).forEach(function (key) {
       const item = mapping[key];
       const human = key.match(/\d+|\D+/g).map(i => i.capitalize()).join(' ');
-      const short = `https://ej.uz/${item.ejuz}`;
+      const short = item.ejuz && `https://ej.uz/${item.ejuz}`;
 
       let copy = document.createElement('span');
-      copy.innerText = '🔗';
-      copy.classList.add('copy');
+      if (short) {
+        copy.innerText = '🔗';
+        copy.classList.add('copy');
 
-      copy.addEventListener('click', (e) => {
-        copyToClipboard(short)
-        successCopy(e.target);
-      });
+        copy.addEventListener('click', (e) => {
+          copyToClipboard(short)
+          successCopy(e.target);
+        });
+      }
 
       let box = document.createElement('div');
       box.innerHTML = `
         <a href="#${key}" class="title">${human}</a><br>
-        ${short} 
+        ${short || ''} 
       `
 
       box.append(copy);
@@ -159,6 +176,15 @@ function qs(param) {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   return urlParams.get(param)
+}
+
+function pickRandomWords(words) {
+  const wordCount = array.length;
+  let indexes = [];
+  for (let i = 0; words > i; i++) {
+    indexes.push(Math.floor(Math.random() * wordCount));
+  }
+  return indexes.map(i => array[i]).join(' ');
 }
 
 function pickText() {
@@ -180,7 +206,7 @@ function pickText() {
     const topicIndex = lookupPart.findIndex(isTopicName);
     const topic = lookupPart[topicIndex];
 
-    pickedLine =  `**${topic}**<br>${pickedLine}`;
+    pickedLine =  `**${topic.trim()}**<br>${pickedLine.trim()}`;
   }
 
   return converter.makeHtml(pickedLine);
