@@ -25,6 +25,10 @@ main {
   flex-direction: column;
 }
 
+.breathe {
+    height: 20vh;
+}
+
 #question {
   transition: opacity 150ms;
   text-align: center;
