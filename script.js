@@ -3,29 +3,36 @@ const reloadButton = document.querySelector( '.reload' );
 const reloadSvg = document.querySelector( 'svg' );
 const question = document.getElementById('question');
 const support = document.querySelector('.support .btn');
+const links = document.querySelector('.links');
 
 const mapping = {
-  'interview12': 165972876, // grade 12, 10/60
-  'monologue12': 606603779, // grade 12 120/300
-  'dialogue9': 361983600, // grade 9 60/420
-  'interview9': 1311882750, // grade 10/60
-  //'D': 730899168
+  'interview12': {
+    'gid': 165972876,
+    'ejuz' : 'g4et'
+  }, // grade 12, 10/60
+  'monologue12': {
+    'gid': 606603779,
+    'ejuz' : 'i5gp'
+  } , // grade 12 120/300
+  'dialogue9': {
+    'gid': 361983600,
+    'ejuz' : 'pzzm'
+  }, // grade 9 60/420
+  'interview9': {
+    'gid': 1311882750,
+    'ejuz' : 'y2ex'
+  }, // grade 10/60
 }
-
-// https://questions-lake.now.sh/#interview12 = https://ej.uz/g4et
-// https://questions-lake.now.sh/#monologue12 = https://ej.uz/i5gp
-// https://questions-lake.now.sh/#dialogue9 = https://ej.uz/pzzm
-// https://questions-lake.now.sh/#interview9 = https://ej.uz/y2ex
 
 let array = [];
 
 var rotation = 0;
 var palettes = [
-  "#B3CC57",
-  "#ECF081",
-  "#FFBE40",
-  "#EF746F",
-  "#AB3E5B"
+  "#bcf4de",
+  "#cde5d7",
+  "#ded6d1",
+  "#eec6ca",
+  "#ffb7c3"
 ]
 var currentPalette = 0;
 
@@ -39,13 +46,16 @@ String.prototype.unquoted = function () {
   return this.replace (/(^")|("$)/g, '');
 }
 
+String.prototype.capitalize = function() {
+  return this.charAt(0).toUpperCase() + this.slice(1)
+}
+
 function reload() {
   reloadClick();
   pause(200).then(write);
 }
 
 function reloadClick() {
-
   reloadEnabled = false;
   rotation -= 180;
   
@@ -61,13 +71,21 @@ function reloadClick() {
   question.style.opacity = 0;
 }
 
+function fetchClass() {
+  links.style.display = 'none';
+
+  let pickedLesson = hash();
+  question.classList.add(pickedLesson);
+  fetchItem(mapping[pickedLesson]);
+}
+
 function fetchItem(id) {
-  if (id === null || id === undefined) {
+  if (id === null || typeof id !== 'object') {
     question.innerHTML = 'Izvēlies klasi...';
     return;
   }
-    
-  let url = `https://docs.google.com/spreadsheets/d/1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ/export?exportFormat=csv&single=true&gid=${id}`;
+
+  let url = `https://docs.google.com/spreadsheets/d/1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ/export?exportFormat=csv&single=true&gid=${id.gid}`;
   
   fetch(url).then(function(response){
       return response.text();
@@ -77,7 +95,7 @@ function fetchItem(id) {
         write();
         return;
       }
-      array = text.match(/[^\r\n]+/g);
+      array = text.match(/[^\r\n]+/g).map(t => t.unquoted());
       write();
     })
     .catch(function(err){
@@ -85,8 +103,7 @@ function fetchItem(id) {
     });
 }
 
-function write()
-{
+function write() {
   let text = '';
   if (!array.length) {
     text = 'te nekā nav...'
@@ -96,6 +113,34 @@ function write()
   
   question.style.opacity = 1;
   question.innerHTML = text;
+}
+
+function makeLinks() {
+  if (!hash()) {
+    Object.keys(mapping).forEach(function (key) {
+      const item = mapping[key];
+      const human = key.match(/\d+|\D+/g).map(i => i.capitalize()).join(' ');
+      const short = `https://ej.uz/${item.ejuz}`;
+
+      let copy = document.createElement('span');
+      copy.innerText = '🔗';
+      copy.classList.add('copy');
+
+      copy.addEventListener('click', (e) => {
+        copyToClipboard(short)
+        successCopy(e.target);
+      });
+
+      let box = document.createElement('div');
+      box.innerHTML = `
+        <a href="#${key}" class="title">${human}</a><br>
+        ${short} 
+      `
+
+      box.append(copy);
+      links.append(box)
+    });
+  }
 }
 
 function hash() {
@@ -108,16 +153,20 @@ function qs(param) {
   return urlParams.get(param)
 }
 
-function pickText() { 
+function pickText() {
+  if (!hash()) {
+    return;
+  }
+
   const topics = array.filter(t => t.length && t.toUpperCase() === t);
   const questions = array.diff(topics);
   const randomQuestionIndex =  Math.floor(Math.random() * questions.length)
   
-  let pickedLine = questions[randomQuestionIndex].unquoted();
-  if (pickedLesson === 'dialogue9') {
+  let pickedLine = questions[randomQuestionIndex];
+  if (hash() === 'dialogue9') {
     pickedLine = pickedLine.replace(/\s\u2022\s/g, "\n- ");
   }
-  
+
   if (topics.length) {
     const lookupPart = array.slice(0,array.indexOf(pickedLine)).reverse();
     const topicIndex = lookupPart.findIndex(isTopicName);
@@ -129,14 +178,41 @@ function pickText() {
   return converter.makeHtml(pickedLine);
 }
 
+function successCopy(el) {
+  let ok = document.createElement('span');
+  ok.innerText = "👍";
+  ok.style.fontSize = '1em';
+
+  el.after(ok);
+
+  pause(1200).then(() => {
+    ok.remove();
+  });
+
+}
+
+const copyToClipboard = str => {
+  const el = document.createElement('textarea');
+  el.value = str;
+  el.setAttribute('readonly', '');
+  el.style.position = 'absolute';
+  el.style.left = '-9999px';
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+};
+
 const pause = time => new Promise(resolve => setTimeout(resolve, time))
 const isTopicName = t => t.toUpperCase() === t;
 
-let pickedLesson = hash() || 'interview12';
-question.classList.add(pickedLesson);
-fetchItem(mapping[pickedLesson]);
+makeLinks();
+if (hash()) {
+  fetchClass();
+}
 
 // Events
+window.addEventListener("hashchange", fetchClass, false);
 reloadButton.addEventListener('click', reload);
 support.addEventListener('click', (el) => {
     el.target.classList.add('expand')

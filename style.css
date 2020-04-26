@@ -7,7 +7,7 @@ body {
 }
 
 body {
-  background: #B3CC57;
+  background: #ded6d1;
   transition: background 500ms cubic-bezier(0.85, -0.48, 0.26, 0.67);
   color: #333;
   text-shadow: 0px 2px 1px rgba(0, 0, 0, 0.1);
@@ -22,6 +22,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 }
 
 #question {
@@ -160,7 +161,32 @@ ul {  list-style: inside; }
   background-size: auto 85%;
 }
 
-.btn-bmc.closed {
-
+a {
+    color: #333333;
+    text-decoration: none;
 }
 
+a:hover {
+    text-decoration: underline;
+}
+
+.links>div {
+    display: inline-block;
+    padding: 8px;
+    margin: 4px;
+    background: #c8ffea;
+    border-radius: 5px;
+    box-shadow: 0 2px 1px rgba(0, 0, 0, 0.1);
+}
+
+.links .title {
+    font-weight: bold;
+}
+
+.links .copy {
+    padding: 4px;
+    cursor: pointer;
+    background: #baeeda;
+    border-radius: 5px;
+    box-shadow: 0 2px 1px rgba(0, 0, 0, 0.1);
+}
