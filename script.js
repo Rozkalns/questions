@@ -246,10 +246,8 @@ window.addEventListener("hashchange", fetchClass, false);
 reloadButton.addEventListener('click', reload);
 support.addEventListener('click', (el) => {
     el.target.classList.add('expand')
-    console.log('click');
+    pause(20 * 1000).then(() => el.target.classList.remove('expand'))
 });
 
 // Show button.
-setTimeout(function() {
-  reloadButton.classList.add('active');
-}, 1);
+pause(1).then(() => reloadButton.classList.add('active'));
