@@ -27,11 +27,11 @@ let array = [];
 
 var rotation = 0;
 var palettes = [
-  "#B3CC57",
-  "#ECF081",
-  "#FFBE40",
-  "#EF746F",
-  "#AB3E5B"
+  "#bcf4de",
+  "#cde5d7",
+  "#ded6d1",
+  "#eec6ca",
+  "#ffb7c3"
 ]
 var currentPalette = 0;
 
