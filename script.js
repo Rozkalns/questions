@@ -4,7 +4,6 @@ const reloadSvg = document.querySelector( 'svg' );
 const question = document.getElementById('question');
 const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
-
 let lesson = '';
 let sheet = {};
 
@@ -80,9 +79,8 @@ function reloadClick() {
 
 function fetchClass() {
   if (hash()) {
-    let pickedLesson = hash();
-    question.classList.add(pickedLesson || 'home');
-    fetchItem(mapping[pickedLesson]);
+    question.classList.add(lesson = hash() || 'home');
+    fetchItem(sheet = mapping[lesson]);
 
     links.style.display = 'none';
     links.innerHTML = '';
@@ -187,7 +185,6 @@ function pickRandomWords(words) {
   for (let i = 0; words > i; i++) {
     indexes.push(Math.floor(Math.random() * wordCount));
   }
-
   return indexes.map(i => array[i]).join(' ');
 }
 
