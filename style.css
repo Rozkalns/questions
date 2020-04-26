@@ -7,7 +7,7 @@ body {
 }
 
 body {
-  background: #B3CC57;
+  background: #bcf4de;
   transition: background 500ms cubic-bezier(0.85, -0.48, 0.26, 0.67);
   color: #333;
   text-shadow: 0px 2px 1px rgba(0, 0, 0, 0.1);
