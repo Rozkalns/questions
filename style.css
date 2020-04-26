@@ -95,21 +95,30 @@ ul {  list-style: inside; }
 }
 
 .btn {
+  box-sizing:border-box;
   background: #fff;
   height: 64px;
   width: 64px;
 }
 
-.btn-bmc {
-  background-image: url("./assets/logo-bmc.svg");
-  background-size: auto 70%;
-  background-repeat: no-repeat;
-  background-position-y: 50%;
-  background-position-x: -3.5%;
+.btn-bmc:before {
+    content:"";
+    display:inline-block;
+    margin-right:10px;
+    height:50px;
+    vertical-align:bottom;
+    width:50px;
+
+  background: url("./assets/logo-bmc.svg") no-repeat 13px 16px;
+  background-size: auto 75%;
+  /*background-repeat: no-repeat;*/
+  /*background-position: 50px 0, 10px -100px;*/
+  /*background-position-y: 50%;*/
+  /*background-position-x: -3.5%;*/
 }
 
-.btn img {
-  height: 100%;
+.btn-bmc.closed {
+
 }
 
 .btn-round {
