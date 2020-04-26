@@ -78,6 +78,7 @@ function reloadClick() {
 
 function fetchClass() {
   if (hash()) {
+    question.innerText = '🔭';
     question.classList.add(lesson = hash() || 'home');
     fetchItem(sheet = mapping[lesson]);
 
