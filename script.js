@@ -33,16 +33,7 @@ const mapping = {
 }
 
 let array = [];
-
-var rotation = 0;
-var palettes = [
-  "#bcf4de",
-  "#cde5d7",
-  "#ded6d1",
-  "#eec6ca",
-  "#ffb7c3"
-]
-var currentPalette = 0;
+let rotation = 0;
 
 // Functions
 Array.prototype.diff = function(a) {
@@ -68,10 +59,6 @@ function reloadClick() {
   reloadSvg.style.webkitTransform = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
   reloadSvg.style.MozTransform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
   reloadSvg.style.transform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
-  
-  currentPalette = currentPalette + 1;
-  currentPalette = currentPalette % palettes.length;
-  document.body.style.background = palettes[currentPalette];
   
   question.style.opacity = '0';
 }
@@ -208,6 +195,10 @@ function pickText() {
     const topic = lookupPart[topicIndex];
 
     pickedLine =  `**${topic.trim()}**<br>${pickedLine.trim()}`;
+  }
+
+  if (pickedLine.length > 700) {
+    pickedLine += '<div class="breathe"></div>'
   }
 
   return converter.makeHtml(pickedLine);
