@@ -206,7 +206,7 @@ function pickText() {
 
 function successCopy(el) {
   let ok = document.createElement('span');
-  ok.innerText = "👍";
+  ok.innerText = "👍 copied";
   ok.style.fontSize = '1em';
 
   el.after(ok);
@@ -238,7 +238,7 @@ window.addEventListener("hashchange", fetchClass, false);
 reloadButton.addEventListener('click', reload);
 support.addEventListener('click', (el) => {
     el.target.classList.add('expand')
-    pause(20 * 1000).then(() => el.target.classList.remove('expand'))
+    pause(7.5 * 1000).then(() => el.target.classList.remove('expand'))
 });
 
 // Show button.
