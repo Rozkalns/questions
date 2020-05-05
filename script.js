@@ -4,6 +4,7 @@ const reloadSvg = document.querySelector( 'svg' );
 const question = document.getElementById('question');
 const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
+const logo = document.getElementById('logo');
 let lesson = '';
 let sheet = {};
 
@@ -35,6 +36,9 @@ const mapping = {
 let array = [];
 let rotation = 0;
 
+logo.src = `./assets/logo-${getRandomInt(0, 3)}.png`;
+logo.style.opacity = '1';
+
 // Functions
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
@@ -46,6 +50,12 @@ String.prototype.unquoted = function () {
 
 String.prototype.capitalize = function() {
   return this.charAt(0).toUpperCase() + this.slice(1)
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
 function reload() {
@@ -172,7 +182,7 @@ function pickRandomWords(words) {
   for (let i = 0; words > i; i++) {
     indexes.push(Math.floor(Math.random() * wordCount));
   }
-  return indexes.map(i => array[i]).join(' ');
+  return indexes.map(i => array[i]).join('<span class="beetroot"></span>');
 }
 
 function pickText() {
