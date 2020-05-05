@@ -75,6 +75,8 @@ function reloadClick() {
 
 function fetchClass() {
   if (hash()) {
+    pause(1).then(() => reloadButton.classList.add('active'));
+
     question.innerText = '🔭';
     question.classList.add(lesson = hash() || 'home');
     fetchItem(sheet = mapping[lesson]);
@@ -135,6 +137,8 @@ function write() {
 }
 
 function makeLinks() {
+  resetToInitialState();
+
   if (!hash()) {
     Object.keys(mapping).forEach(function (key) {
       const item = mapping[key];
@@ -166,14 +170,17 @@ function makeLinks() {
   }
 }
 
-function hash() {
-  return window.location.hash.replace(/^#/, '');
+function resetToInitialState() {
+  links.innerHTML = '';
+  question.className = '';
+
+  if (!hash()) {
+    reloadButton.classList.remove('active')
+  }
 }
 
-function qs(param) {
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  return urlParams.get(param)
+function hash() {
+  return window.location.hash.replace(/^#/, '');
 }
 
 function pickRandomWords(words) {
@@ -251,5 +258,3 @@ support.addEventListener('click', (el) => {
     pause(7.5 * 1000).then(() => el.target.classList.remove('expand'))
 });
 
-// Show button.
-pause(1).then(() => reloadButton.classList.add('active'));
