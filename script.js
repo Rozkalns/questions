@@ -11,27 +11,27 @@ let sheet = {};
 const mapping = {
   'interview12': {
     'gid': 165972876,
-    'ejuz' : 'g4et'
+    'ejuz' : 'vwhe'
   }, // grade 12, 10/60
   'monologue12': {
     'gid': 606603779,
-    'ejuz' : 'i5gp'
+    'ejuz' : 'fpua'
   } , // grade 12 120/300
   'dialogue9': {
     'gid': 361983600,
-    'ejuz' : 'pzzm'
+    'ejuz' : 'rikg'
   }, // grade 9 60/420
   'interview9': {
     'gid': 1311882750,
-    'ejuz' : 'y2ex'
+    'ejuz' : 'net7'
   }, // grade 10/60
   'words': {
     'type': 'randomTwo',
     'gid': 1863447477,
     'range': 'A2:A',
-    'ejuz' : null
+    'ejuz' : '5ugw'
   }, // grade 10/60
-}
+};
 
 let array = [];
 let rotation = 0;
