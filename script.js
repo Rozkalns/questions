@@ -5,6 +5,8 @@ const question = document.getElementById('question');
 const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
 const logo = document.getElementById('logo');
+
+let showEjUz = getCookie('showEjUz');
 let lesson = '';
 let sheet = {};
 
@@ -74,7 +76,7 @@ function reloadClick() {
 }
 
 function fetchClass() {
-  if (hash()) {
+  if (Object.keys(mapping).includes(hash())) {
     pause(1).then(() => reloadButton.classList.add('active'));
 
     question.innerText = '🔭';
@@ -84,7 +86,7 @@ function fetchClass() {
     links.style.display = 'none';
     links.innerHTML = '';
   } else {
-    question.innerText = 'Questions Lake';
+    question.innerText = 'Kabatas';
     makeLinks();
   }
 }
@@ -143,7 +145,7 @@ function makeLinks() {
     Object.keys(mapping).forEach(function (key) {
       const item = mapping[key];
       const human = key.match(/\d+|\D+/g).map(i => i.capitalize()).join(' ');
-      const short = item.ejuz && `https://ej.uz/${item.ejuz}`;
+      const short = showEjUz && item.ejuz && `https://ej.uz/${item.ejuz}`;
 
       let copy = document.createElement('span');
       if (short) {
@@ -183,6 +185,10 @@ function hash() {
   return window.location.hash.replace(/^#/, '');
 }
 
+function isHash(value) {
+  return hash() === value;
+}
+
 function pickRandomWords(words) {
   const wordCount = array.length;
   let indexes = [];
@@ -202,7 +208,7 @@ function pickText() {
   const randomQuestionIndex =  Math.floor(Math.random() * questions.length)
   
   let pickedLine = questions[randomQuestionIndex];
-  if (hash() === 'dialogue9') {
+  if (isHash('dialogue9')) {
     pickedLine = pickedLine.replace(/\s\u2022\s/g, "\n- ");
   }
 
@@ -250,6 +256,16 @@ const pause = time => new Promise(resolve => setTimeout(resolve, time))
 const isTopicName = t => t.toUpperCase() === t;
 
 // Events
+if (isHash('ejuz-on')) {
+  updateCookie('showEjUz', true);
+  window.location.hash = '#';
+}
+
+if (isHash('ejuz-off')) {
+  updateCookie('showEjUz', false);
+  window.location.hash = '#';
+}
+
 fetchClass();
 window.addEventListener("hashchange", fetchClass, false);
 reloadButton.addEventListener('click', reload);
@@ -258,3 +274,30 @@ support.addEventListener('click', (el) => {
     pause(7.5 * 1000).then(() => el.target.classList.remove('expand'))
 });
 
+
+// Helpers
+function updateCookie(cookie, value) {
+  setCookie(cookie,true, value ? 180 : -1);
+}
+
+function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  document.cookie = `${cname}=${cvalue};expires=${d.toUTCString()};path=/`;
+}
+
+function getCookie(cname) {
+  const name = cname + "=";
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
