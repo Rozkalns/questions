@@ -52,7 +52,7 @@ const levels = {
 let array = [];
 let rotation = 0;
 
-logo.src = `./assets/beet-skills-${getRandomInt(0, 3)}.png`;
+logo.src = `./assets/beet-skills-${getRandomInt(0, 3)+1}.png`;
 logo.style.opacity = '1';
 
 // Functions
