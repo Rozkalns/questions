@@ -196,7 +196,7 @@ function makeLinks() {
 
     }
 
-    links.style.display = 'block';
+    links.style.display = 'flex';
   }
 }
 
