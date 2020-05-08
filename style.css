@@ -245,5 +245,6 @@ nav h1 {
   margin: 0;
 }
 nav #logo {
+  opacity: 0;
   height: 80px;
 }
