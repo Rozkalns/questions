@@ -52,8 +52,8 @@ const levels = {
 let array = [];
 let rotation = 0;
 
-logo.src = `./assets/beet-skills-${getRandomInt(0, 3)+1}.png`;
-logo.style.opacity = '1';
+// logo.src = `./assets/beet-skills-${getRandomInt(0, 3)+1}.png`;
+// logo.style.opacity = '1';
 
 // Functions
 Array.prototype.diff = function(a) {
