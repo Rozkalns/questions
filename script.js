@@ -100,7 +100,7 @@ function fetchClass() {
     links.style.display = 'none';
     links.innerHTML = '';
   } else {
-    question.innerText = 'Pockets';
+    question.innerText = 'Grooves';
     sub = '';
     makeLinks();
   }
@@ -131,7 +131,7 @@ function fetchItem(sheet) {
 function write() {
   let text = '';
   if (!array.length) {
-    text = 'te nekā nav...'
+    text = 'No groove found...'
   } else {
     let type = 'standard';
     if (sheet.hasOwnProperty('type')) {
