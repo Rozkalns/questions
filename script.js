@@ -7,6 +7,7 @@ const links = document.querySelector('.links');
 const logo = document.getElementById('logo');
 
 let showEjUz = getCookie('showEjUz');
+let sub = '';
 let lesson = '';
 let sheet = {};
 
@@ -34,6 +35,19 @@ const mapping = {
     'ejuz' : '5ugw'
   }, // grade 10/60
 };
+
+const levels = {
+  'English B2-C1': [
+    'interview12',
+    'monologue12',
+    'words'
+  ],
+  'English B1': [
+    'dialogue9',
+    'interview9',
+    'words'
+  ]
+}
 
 let array = [];
 let rotation = 0;
@@ -86,7 +100,8 @@ function fetchClass() {
     links.style.display = 'none';
     links.innerHTML = '';
   } else {
-    question.innerText = 'Kabatas';
+    question.innerText = 'Pockets';
+    sub = '';
     makeLinks();
   }
 }
@@ -142,31 +157,44 @@ function makeLinks() {
   resetToInitialState();
 
   if (!hash()) {
-    Object.keys(mapping).forEach(function (key) {
-      const item = mapping[key];
-      const human = key.match(/\d+|\D+/g).map(i => i.capitalize()).join(' ');
-      const short = showEjUz && item.ejuz && `https://ej.uz/${item.ejuz}`;
+    if (!sub.length) {
+      ['English B2-C1', 'English B1'].forEach(i => {
+        let box = document.createElement('div');
+        box.addEventListener('click', e => {
+          sub = e.target.id;
+          makeLinks();
+        })
+        box.innerHTML = `<a id="${i}" class="title">${i}</a>`
+        links.append(box)
+      });
+    } else {
+      levels[sub].forEach(function (key) {
+        const item = mapping[key];
+        const human = key.match(/\D+/g).map(i => i.capitalize()).join(' ');
+        const short = showEjUz && item.ejuz && `https://ej.uz/${item.ejuz}`;
 
-      let copy = document.createElement('span');
-      if (short) {
-        copy.innerText = '🔗';
-        copy.classList.add('copy');
+        let copy = document.createElement('span');
+        if (short) {
+          copy.innerText = '🔗';
+          copy.classList.add('copy');
 
-        copy.addEventListener('click', (e) => {
-          copyToClipboard(short)
-          successCopy(e.target);
-        });
-      }
+          copy.addEventListener('click', (e) => {
+            copyToClipboard(short)
+            successCopy(e.target);
+          });
+        }
 
-      let box = document.createElement('div');
-      box.innerHTML = `
-        <a href="#${key}" class="title">${human}</a><br>
-        ${short || ''} 
-      `
+        let box = document.createElement('div');
+        box.innerHTML = `
+          <a href="#${key}" class="title">${human}</a><br>
+          ${short || ''} 
+        `
 
-      box.append(copy);
-      links.append(box)
-    });
+        box.append(copy);
+        links.append(box)
+      });
+
+    }
 
     links.style.display = 'block';
   }
