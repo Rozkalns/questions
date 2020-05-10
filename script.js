@@ -4,35 +4,29 @@ const reloadSvg = document.querySelector( 'svg' );
 const question = document.getElementById('question');
 const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
-const logo = document.getElementById('logo');
+const home = document.querySelector('.home');
 
-let showEjUz = getCookie('showEjUz');
 let sub = '';
 let lesson = '';
 let sheet = {};
 
 const mapping = {
   'interview12': {
-    'gid': 165972876,
-    'ejuz' : 'vwhe'
+    'gid': 165972876
   }, // grade 12, 10/60
   'monologue12': {
-    'gid': 606603779,
-    'ejuz' : 'fpua'
+    'gid': 606603779
   } , // grade 12 120/300
   'dialogue9': {
-    'gid': 361983600,
-    'ejuz' : 'rikg'
+    'gid': 361983600
   }, // grade 9 60/420
   'interview9': {
-    'gid': 1311882750,
-    'ejuz' : 'net7'
+    'gid': 1311882750
   }, // grade 10/60
   'words': {
     'type': 'randomTwo',
     'gid': 1863447477,
-    'range': 'A2:A',
-    'ejuz' : '5ugw'
+    'range': 'A2:A'
   }, // grade 10/60
 };
 
@@ -52,9 +46,6 @@ const levels = {
 let array = [];
 let rotation = 0;
 
-// logo.src = `./assets/beet-skills-${getRandomInt(0, 3)+1}.png`;
-// logo.style.opacity = '1';
-
 // Functions
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
@@ -66,12 +57,6 @@ String.prototype.unquoted = function () {
 
 String.prototype.capitalize = function() {
   return this.charAt(0).toUpperCase() + this.slice(1)
-}
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
 function reload() {
@@ -90,17 +75,20 @@ function reloadClick() {
 }
 
 function fetchClass() {
-  if (Object.keys(mapping).includes(hash())) {
-    pause(1).then(() => reloadButton.classList.add('active'));
+  question.classList.add(lesson = hash() || 'home');
+  if (this.className === 'home') {
+    lesson = 'home';
+  }
 
+  if (Object.keys(mapping).includes(lesson)) {
     question.innerText = '🔭';
-    question.classList.add(lesson = hash() || 'home');
     fetchItem(sheet = mapping[lesson]);
+    pause(1).then(() => reloadButton.classList.add('active'));
 
     links.style.display = 'none';
     links.innerHTML = '';
   } else {
-    question.innerText = 'Grooves';
+    question.innerText = 'English Grooves';
     sub = '';
     makeLinks();
   }
@@ -111,6 +99,12 @@ function fetchItem(sheet) {
     question.innerHTML = 'Izvēlies klasi...';
     return;
   }
+
+  if (!hash().length) {
+    return;
+  }
+
+  question.classList.toggle('home');
 
   let url = `https://docs.google.com/spreadsheets/d/1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ/export?exportFormat=csv&single=true`;
   url += sheet.hasOwnProperty('gid') ? `&gid=${sheet.gid}` : '';
@@ -169,26 +163,11 @@ function makeLinks() {
       });
     } else {
       levels[sub].forEach(function (key) {
-        const item = mapping[key];
         const human = key.match(/\D+/g).map(i => i.capitalize()).join(' ');
-        const short = showEjUz && item.ejuz && `https://ej.uz/${item.ejuz}`;
-
         let copy = document.createElement('span');
-        if (short) {
-          copy.innerText = '🔗';
-          copy.classList.add('copy');
-
-          copy.addEventListener('click', (e) => {
-            copyToClipboard(short)
-            successCopy(e.target);
-          });
-        }
 
         let box = document.createElement('div');
-        box.innerHTML = `
-          <a href="#${key}" class="title">${human}</a><br>
-          ${short || ''} 
-        `
+        box.innerHTML = `<a href="#${key}" class="title">${human}</a>`;
 
         box.append(copy);
         links.append(box)
@@ -202,7 +181,7 @@ function makeLinks() {
 
 function resetToInitialState() {
   links.innerHTML = '';
-  question.className = '';
+  question.className = 'home';
 
   if (!hash()) {
     reloadButton.classList.remove('active')
@@ -248,84 +227,20 @@ function pickText() {
     pickedLine =  `**${topic.trim()}**<br>${pickedLine.trim()}`;
   }
 
-  if (pickedLine.length > 700) {
-    pickedLine += '<div class="breathe"></div>'
-  }
+  pickedLine += '<div class="breathe"></div>'
 
   return converter.makeHtml(pickedLine);
 }
-
-function successCopy(el) {
-  let ok = document.createElement('span');
-  ok.innerText = "👍 copied";
-  ok.style.fontSize = '1em';
-
-  el.after(ok);
-
-  pause(1200).then(() => {
-    ok.remove();
-  });
-
-}
-
-const copyToClipboard = str => {
-  const el = document.createElement('textarea');
-  el.value = str;
-  el.setAttribute('readonly', '');
-  el.style.position = 'absolute';
-  el.style.left = '-9999px';
-  document.body.appendChild(el);
-  el.select();
-  document.execCommand('copy');
-  document.body.removeChild(el);
-};
 
 const pause = time => new Promise(resolve => setTimeout(resolve, time))
 const isTopicName = t => t.toUpperCase() === t;
 
 // Events
-if (isHash('ejuz-on')) {
-  updateCookie('showEjUz', true);
-  window.location.hash = '#';
-}
-
-if (isHash('ejuz-off')) {
-  updateCookie('showEjUz', false);
-  window.location.hash = '#';
-}
-
 fetchClass();
 window.addEventListener("hashchange", fetchClass, false);
+home.addEventListener("click", fetchClass, false);
 reloadButton.addEventListener('click', reload);
 support.addEventListener('click', (el) => {
     el.target.classList.add('expand')
     pause(7.5 * 1000).then(() => el.target.classList.remove('expand'))
 });
-
-
-// Helpers
-function updateCookie(cookie, value) {
-  setCookie(cookie,true, value ? 180 : -1);
-}
-
-function setCookie(cname, cvalue, exdays) {
-  const d = new Date();
-  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-  document.cookie = `${cname}=${cvalue};expires=${d.toUTCString()};path=/`;
-}
-
-function getCookie(cname) {
-  const name = cname + "=";
-  const decodedCookie = decodeURIComponent(document.cookie);
-  const ca = decodedCookie.split(';');
-  for(let i = 0; i <ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) === 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-}
