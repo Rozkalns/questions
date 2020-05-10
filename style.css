@@ -35,7 +35,7 @@ main {
   max-width: 95%;
   font-size: 5em;
   font-weight: 100;
-  margin: 0 6px;
+  margin: 0 6px 1rem;
   overflow: auto;
 }
 #question p {
