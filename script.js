@@ -28,6 +28,11 @@ const mapping = {
     'gid': 1863447477,
     'range': 'A2:A'
   }, // grade 10/60
+  'addition': {
+    'type': 'maths',
+    'gid': 730899168,
+    'range': 'A1:A100'
+  }, // grade 10/60
 };
 
 const levels = {
