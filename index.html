@@ -8,7 +8,9 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
-    gtag('config', 'UA-164652199-3');
+    gtag('config', 'UA-164652199-3', {
+      'page_path': location.pathname + location.search + location.hash
+    });
   </script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
