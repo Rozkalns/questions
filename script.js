@@ -235,9 +235,16 @@ function pickText() {
 const pause = time => new Promise(resolve => setTimeout(resolve, time))
 const isTopicName = t => t.toUpperCase() === t;
 
+function updateGA() {
+  gtag('config', 'UA-164652199-3', {
+    'page_path': location.pathname + location.search + location.hash
+  })
+}
+
 // Events
 fetchClass();
-window.addEventListener("hashchange", fetchClass, false);
+window.addEventListener("hashchange", updateGA);
+window.addEventListener("hashchange", fetchClass);
 home.addEventListener("click", fetchClass, false);
 reloadButton.addEventListener('click', reload);
 support.addEventListener('click', (el) => {
