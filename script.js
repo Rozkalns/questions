@@ -31,7 +31,7 @@ const mapping = {
   'addition': {
     'type': 'maths',
     'gid': 730899168,
-    'range': 'A1:A100'
+    'range': 'G:G'
   }, // grade 10/60
 };
 
@@ -141,6 +141,9 @@ function write() {
       case 'randomTwo':
         text = pickRandomWords(2);
         break;
+      case 'maths':
+        text = pickRandom();
+        break;
       case 'standard':
       default:
         text = pickText();
@@ -199,6 +202,12 @@ function hash() {
 
 function isHash(value) {
   return hash() === value;
+}
+
+function pickRandom() {
+  const wordCount = array.length;
+  const index = Math.floor(Math.random() * wordCount);
+  return array[index];
 }
 
 function pickRandomWords(words) {
