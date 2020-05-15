@@ -81,9 +81,9 @@ function reloadClick() {
 
 function fetchClass() {
   question.classList.add(lesson = hash() || 'home');
-  if (this.className === 'home') {
-    lesson = 'home';
-  }
+  // if (this.className === 'home') {
+  //   lesson = 'home';
+  // }
 
   if (Object.keys(mapping).includes(lesson)) {
     question.innerText = '🔭';
@@ -265,6 +265,11 @@ support.addEventListener('click', (el) => {
     el.target.classList.add('expand')
     sleep(7.5 * 1000).then(() => el.target.classList.remove('expand'))
 });
+
+import AudioRecorder from 'https://cdn.jsdelivr.net/npm/audio-recorder-polyfill/index.js'
+window.MediaRecorder = AudioRecorder
+
+
 
 const recordAudio = () =>
   new Promise(async resolve => {
