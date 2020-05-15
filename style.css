@@ -90,6 +90,15 @@ ul {  list-style: inside; }
   white-space: nowrap;
 }
 
+.recording {
+  position: fixed;
+  bottom: 5%;
+}
+
+.recording button {
+  padding: 5px;
+}
+
 .reload {
   transition: all 300ms;
   transform: scale(1);
@@ -106,6 +115,7 @@ ul {  list-style: inside; }
   top: 85%;
   left: 50%;
 }
+
 .reload.active {
   transform: scale(1);
   opacity: 1;

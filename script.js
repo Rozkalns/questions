@@ -66,7 +66,7 @@ String.prototype.capitalize = function() {
 
 function reload() {
   reloadClick();
-  pause(200).then(write);
+  sleep(200).then(write);
 }
 
 function reloadClick() {
@@ -81,14 +81,14 @@ function reloadClick() {
 
 function fetchClass() {
   question.classList.add(lesson = hash() || 'home');
-  if (this.className === 'home') {
-    lesson = 'home';
-  }
+  // if (this.className === 'home') {
+  //   lesson = 'home';
+  // }
 
   if (Object.keys(mapping).includes(lesson)) {
     question.innerText = '🔭';
     fetchItem(sheet = mapping[lesson]);
-    pause(1).then(() => reloadButton.classList.add('active'));
+    sleep(1).then(() => reloadButton.classList.add('active'));
 
     links.style.display = 'none';
     links.innerHTML = '';
@@ -246,7 +246,7 @@ function pickText() {
   return converter.makeHtml(pickedLine);
 }
 
-const pause = time => new Promise(resolve => setTimeout(resolve, time))
+const sleep = time => new Promise(resolve => setTimeout(resolve, time))
 const isTopicName = t => t.toUpperCase() === t;
 
 function updateGA() {
@@ -263,5 +263,94 @@ home.addEventListener("click", fetchClass, false);
 reloadButton.addEventListener('click', reload);
 support.addEventListener('click', (el) => {
     el.target.classList.add('expand')
-    pause(7.5 * 1000).then(() => el.target.classList.remove('expand'))
+    sleep(7.5 * 1000).then(() => el.target.classList.remove('expand'))
+});
+
+import AudioRecorder from 'https://cdn.jsdelivr.net/npm/audio-recorder-polyfill/index.js'
+window.MediaRecorder = AudioRecorder
+
+
+
+const recordAudio = () =>
+  new Promise(async resolve => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream);
+    let audioChunks = [];
+
+    mediaRecorder.addEventListener("dataavailable", event => {
+      audioChunks.push(event.data);
+    });
+
+    const start = () => {
+      audioChunks = [];
+      mediaRecorder.start();
+    };
+
+    const stop = () =>
+      new Promise(resolve => {
+        mediaRecorder.addEventListener("stop", () => {
+          const audioBlob = new Blob(audioChunks);
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audio = new Audio(audioUrl);
+          const play = () => audio.play();
+          resolve({ audioBlob, audioUrl, play });
+        });
+
+        mediaRecorder.stop();
+      });
+
+    resolve({ start, stop });
+  });
+
+
+const recordButton = document.querySelector('#record');
+const stopButton = document.querySelector('#stop');
+const playButton = document.querySelector('#play');
+const saveButton = document.querySelector('#save');
+const savedAudioMessagesContainer = document.querySelector('#saved-audio-messages');
+
+let recorder;
+let audio;
+
+recordButton.addEventListener('click', async () => {
+  recordButton.setAttribute('disabled', true);
+  stopButton.removeAttribute('disabled');
+  playButton.setAttribute('disabled', true);
+  // saveButton.setAttribute('disabled', true);
+  if (!recorder) {
+    recorder = await recordAudio();
+  }
+  recorder.start();
+});
+
+stopButton.addEventListener('click', async () => {
+  recordButton.removeAttribute('disabled');
+  stopButton.setAttribute('disabled', true);
+  playButton.removeAttribute('disabled');
+  // saveButton.removeAttribute('disabled');
+  audio = await recorder.stop();
+});
+
+playButton.addEventListener('click', () => {
+  audio.play();
+});
+
+saveButton.addEventListener('click', () => {
+  return;
+  // const reader = new FileReader();
+  // reader.readAsDataURL(audio.audioBlob);
+  // reader.onload = () => {
+  //   const base64AudioMessage = reader.result.split(',')[1];
+  //
+  //   fetch('/messages', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({ message: base64AudioMessage })
+  //   }).then(res => {
+  //     if (res.status === 201) {
+  //       return populateAudioMessages();
+  //     }
+  //     console.log('Invalid status saving audio message: ' + res.status);
+  //   });
+  // };
 });
