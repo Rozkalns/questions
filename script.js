@@ -1,10 +1,12 @@
-const converter = new showdown.Converter();
 const reloadButton = document.querySelector( '.reload' );
-const reloadSvg = document.querySelector( 'svg' );
-const question = document.getElementById('question');
+const reloadSvg = reloadButton.querySelector( 'svg' );
+const questionContainer = document.getElementById('question');
+const question = questionContainer.querySelector('.content');
 const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
 const home = document.querySelector('.home');
+
+const converter = new showdown.Converter();
 
 let sub = '';
 let lesson = '';
@@ -76,7 +78,7 @@ function reloadClick() {
   reloadSvg.style.MozTransform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
   reloadSvg.style.transform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
   
-  question.style.opacity = '0';
+  questionContainer.style.opacity = '0';
 }
 
 function fetchClass() {
@@ -123,6 +125,7 @@ function fetchItem(sheet) {
       write();
     })
     .catch(function(err){
+      question.innerHTML = 'Unfortunately an error occurred...';
       console.log(err);  
     });
 }
@@ -150,8 +153,8 @@ function write() {
         break;
     }
   }
-  
-  question.style.opacity = '1';
+
+  questionContainer.style.opacity = '1';
   question.innerHTML = text;
 }
 

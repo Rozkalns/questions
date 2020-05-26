@@ -35,6 +35,55 @@ main {
     height: 20vh;
 }
 
+.timer {
+  width: 60%;
+  display: flex;
+  position: relative;
+  border-left: 1px solid #bebebe;
+  border-right: 1px solid #bebebe;
+}
+
+.timer .push {
+  flex-grow: 1;
+}
+.timer .beetroot {
+  width: 64px;
+  height: auto;
+  z-index: 2;
+}
+.timer .beetroot .leaf {
+  animation: grow 2s infinite alternate ease-in-out;
+  transform-origin: bottom;
+  transform-box: fill-box;
+}
+
+.timer .line {
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  height: 1px;
+  background: #bebebe;
+  z-index: 1;
+}
+
+@keyframes grow {
+  from {
+    transform: scale(.6);
+  }
+  to {
+    transform: scale(.9);
+  }
+}
+
+@media (max-width: 500px) {
+  .timer {
+    width: 96%;
+  }
+  .timer .beetroot {
+    width: 42px;
+  }
+}
+
 #question {
   transition: opacity 150ms;
   text-align: center;
