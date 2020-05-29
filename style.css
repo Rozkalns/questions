@@ -36,19 +36,59 @@ main {
 }
 
 .timer {
-  width: 60%;
-  display: flex;
+  display: none;
   position: relative;
   border-left: 1px solid #bebebe;
   border-right: 1px solid #bebebe;
+
+  flex-basis: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+#question:not(.home) .timer {
+  display: flex;
 }
 
 .timer .push {
   flex-grow: 1;
 }
+
+.timer .push.read {
+  transition: all var(--read);
+  flex-grow: 0.001;
+}
+
+.timer .push.execute {
+  transition: all var(--execute) linear;
+}
+
+.timer .beetroot.shake {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
 .timer .beetroot {
   width: 64px;
-  height: auto;
+  height: 64px;
   z-index: 2;
 }
 .timer .beetroot .leaf {
@@ -76,11 +116,19 @@ main {
 }
 
 @media (max-width: 500px) {
+  #question #content {
+    margin-top: 40px;
+  }
   .timer {
-    width: 96%;
+    position: fixed;
+    margin: 0 10px;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.3);
   }
   .timer .beetroot {
     width: 42px;
+    height: 42px;
   }
 }
 
@@ -114,7 +162,7 @@ main {
   text-align: left;
 }
 
-#question .beetroot {
+#question .words.beetroot {
   background: url('./assets/beet.svg');
   background-size: cover;
   display: inline-block;
@@ -125,7 +173,7 @@ main {
 }
 
 @media (max-width: 500px) {
-  #question .beetroot {
+  #question .words.beetroot {
     width: 36px;
     height: 36px;
     margin: 0 18px;

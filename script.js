@@ -1,10 +1,13 @@
 const reloadButton = document.querySelector( '.reload' );
 const reloadSvg = reloadButton.querySelector( 'svg' );
 const questionContainer = document.getElementById('question');
-const question = questionContainer.querySelector('.content');
+const question = document.getElementById('content');
 const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
+const timer = document.querySelector('.timer');
+const timerPusher = document.querySelector('.timer .push');
 const home = document.querySelector('.home');
+const initialTitle = question.innerText;
 
 const converter = new showdown.Converter();
 
@@ -14,27 +17,51 @@ let sheet = {};
 
 const mapping = {
   'interview12': {
-    'gid': 165972876
-  }, // grade 12, 10/60
+    gid: 165972876,
+    time: {
+      read: 1/6, // 15 sec
+      execute: 1 // 60 sec
+    }
+  },
   'monologue12': {
-    'gid': 606603779
-  } , // grade 12 120/300
+    gid: 606603779,
+    time: {
+      read: 2, // 120 sec
+      execute: 5 // 300 sec
+    }
+  } ,
   'dialogue9': {
-    'gid': 361983600
-  }, // grade 9 60/420
+    gid: 361983600,
+    time: {
+      read: 1, // 60 sec
+      execute: 7 // 420 sec
+    }
+  },
   'interview9': {
-    'gid': 1311882750
-  }, // grade 10/60
+    gid: 1311882750,
+    time: {
+      read: 1/4, // 15 sec
+      execute: 1 // 60 sec
+    }
+  },
   'words': {
     'type': 'randomTwo',
-    'gid': 1863447477,
-    'range': 'A2:A'
-  }, // grade 10/60
+    gid: 1863447477,
+    'range': 'A2:A',
+    time: {
+      read: 1/4, // 15 sec
+      execute: 1 // 60 sec
+    }
+  },
   'addition': {
     'type': 'maths',
-    'gid': 730899168,
-    'range': 'G:G'
-  }, // grade 10/60
+    gid: 730899168,
+    'range': 'G:G',
+    time: {
+      read: 1/4, // 15 sec
+      execute: 1 // 60 sec
+    }
+  },
 };
 
 const levels = {
@@ -68,7 +95,7 @@ String.prototype.capitalize = function() {
 
 function reload() {
   reloadClick();
-  pause(200).then(write);
+  pause(500).then(write);
 }
 
 function reloadClick() {
@@ -82,22 +109,23 @@ function reloadClick() {
 }
 
 function fetchClass() {
-  question.classList.add(lesson = hash() || 'home');
-  if (this.className === 'home') {
-    lesson = 'home';
+  if (!hash()) {
+    makeLinks();
+    return;
   }
 
-  if (Object.keys(mapping).includes(lesson)) {
+  if (Object.keys(mapping).includes(lesson = hash())) {
     question.innerText = '🔭';
-    fetchItem(sheet = mapping[lesson]);
-    pause(1).then(() => reloadButton.classList.add('active'));
 
+    fetchItem(sheet = mapping[lesson])
+      .then(() => {
+        if (hash()) {
+          questionContainer.className = lesson
+        }
+      });
+    pause(1).then(() => reloadButton.classList.add('active'));
     links.style.display = 'none';
     links.innerHTML = '';
-  } else {
-    question.innerText = 'English Grooves';
-    sub = '';
-    makeLinks();
   }
 }
 
@@ -107,20 +135,21 @@ function fetchItem(sheet) {
     return;
   }
 
-  if (!hash().length) {
+  if (!hash()) {
     return;
   }
-
-  question.classList.toggle('home');
 
   let url = `https://docs.google.com/spreadsheets/d/1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ/export?exportFormat=csv&single=true`;
   url += sheet.hasOwnProperty('gid') ? `&gid=${sheet.gid}` : '';
   url += sheet.hasOwnProperty('range') ? `&range=${sheet.range}` : '';
 
-  fetch(url).then(function(response){
+  return fetch(url).then(function(response){
       return response.text();
     })
     .then(function(text){
+      if (!hash()) {
+        return;
+      }
       array = text.match(/[^\r\n]+/g).map(t => t.unquoted());
       write();
     })
@@ -128,6 +157,29 @@ function fetchItem(sheet) {
       question.innerHTML = 'Unfortunately an error occurred...';
       console.log(err);  
     });
+}
+
+function startTimer() {
+  const read = sheet.time.read * 60;
+  const exec = sheet.time.execute * 60;
+
+  let el = document.querySelector('.timer');
+  let parent = el.parentNode;
+  let cloned = el.cloneNode(true);
+  parent.replaceChild(cloned, el);
+
+  cloned.classList.remove('end');
+  cloned.style.setProperty('--read', read + 's');
+  cloned.style.setProperty('--execute', exec + 's');
+
+  let pusherCl = cloned.querySelector('.push').classList;
+  let beetRootCl = cloned.querySelector('.beetroot').classList;
+  pusherCl.remove(...['execute', 'read']);
+  beetRootCl.remove('shake');
+
+  pause(1000).then(() => pusherCl.add('read'));
+  pause(read * 1000).then(() => pusherCl.replace('read', 'execute'));
+  pause((read + exec) * 1000 ).then(() => beetRootCl.add('shake'));
 }
 
 function write() {
@@ -154,12 +206,19 @@ function write() {
     }
   }
 
+  startTimer();
+
   questionContainer.style.opacity = '1';
   question.innerHTML = text;
 }
 
-function makeLinks() {
+function makeLinks(e) {
   resetToInitialState();
+
+  if (e && e.target) {
+    sub = '';
+    console.log('here ');
+  }
 
   if (!hash()) {
     if (!sub.length) {
@@ -191,8 +250,9 @@ function makeLinks() {
 }
 
 function resetToInitialState() {
+  questionContainer.className = 'home';
+  question.innerText = initialTitle;
   links.innerHTML = '';
-  question.className = 'home';
 
   if (!hash()) {
     reloadButton.classList.remove('active')
@@ -200,7 +260,8 @@ function resetToInitialState() {
 }
 
 function hash() {
-  return window.location.hash.replace(/^#/, '');
+  const hash = window.location.hash.replace(/^#/, '');
+  return !!hash.length && hash;
 }
 
 function isHash(value) {
@@ -219,7 +280,7 @@ function pickRandomWords(words) {
   for (let i = 0; words > i; i++) {
     indexes.push(Math.floor(Math.random() * wordCount));
   }
-  return indexes.map(i => array[i]).join('<span class="beetroot"></span>');
+  return indexes.map(i => array[i]).join('<span class="words beetroot"></span>');
 }
 
 function pickText() {
@@ -249,7 +310,39 @@ function pickText() {
   return converter.makeHtml(pickedLine);
 }
 
+
+const makeCancelable = promise => {
+  let rejectFn;
+
+  const wrappedPromise = new Promise((resolve, reject) => {
+    rejectFn = reject;
+
+    Promise.resolve(promise)
+      .then(resolve)
+      .catch(reject);
+  });
+
+  wrappedPromise.cancel = () => {
+    rejectFn({ canceled: true });
+  };
+
+  return wrappedPromise;
+};
+
 const pause = time => new Promise(resolve => setTimeout(resolve, time))
+const debounce = (f, interval) => {
+  let timer = null;
+
+  return (...args) => {
+    clearTimeout(timer);
+    return new Promise((resolve) => {
+      timer = setTimeout(
+        () => resolve(f(...args)),
+        interval,
+      );
+    });
+  };
+}
 const isTopicName = t => t.toUpperCase() === t;
 
 function updateGA() {
@@ -259,10 +352,14 @@ function updateGA() {
 }
 
 // Events
-fetchClass();
+if (hash()) {
+  fetchClass();
+} else {
+  makeLinks();
+}
 window.addEventListener("hashchange", updateGA);
 window.addEventListener("hashchange", fetchClass);
-home.addEventListener("click", fetchClass, false);
+home.addEventListener("click", makeLinks, false);
 reloadButton.addEventListener('click', reload);
 support.addEventListener('click', (el) => {
     el.target.classList.add('expand')
