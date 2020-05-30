@@ -54,8 +54,8 @@ main {
   font-size: 20px;
   position: absolute;
   display: block;
-  top: 0;
-  left: 0;
+  top: 4px;
+  left: 4px;
 }
 
 .timer.read:before {
@@ -63,7 +63,7 @@ main {
 }
 
 .timer.execute:before {
-  content: 'Execute ' attr(data-execute);
+  content: 'Speak ' attr(data-execute);
 }
 
 .timer .push {
@@ -72,6 +72,7 @@ main {
 
 .timer.read .push {
   transition: all var(--read);
+  transition-delay: .9s;
   flex-grow: 0.001;
 }
 
@@ -82,6 +83,11 @@ main {
 .timer .beetroot.shake {
   animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
   transform: translate3d(0, 0, 0);
+}
+
+.timer .beetroot.fade {
+  transition: opacity var(--execute) ease-out;
+  opacity: 0;
 }
 
 @keyframes shake {
@@ -103,6 +109,7 @@ main {
 }
 
 .timer .beetroot {
+  opacity: 1;
   width: 64px;
   height: 64px;
   z-index: 2;

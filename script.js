@@ -17,7 +17,7 @@ const mapping = {
   'interview12': {
     gid: 165972876,
     time: {
-      read: 1/6, // 15 sec
+      read: 1/4, // 15 sec
       execute: 1 // 60 sec
     }
   },
@@ -31,8 +31,8 @@ const mapping = {
   'dialogue9': {
     gid: 361983600,
     time: {
-      read: 1, // 60 sec
-      execute: 7 // 420 sec
+      read: 1.5, // 90 sec
+      execute: -1 // 420 sec
     }
   },
   'interview9': {
@@ -43,21 +43,17 @@ const mapping = {
     }
   },
   'words': {
-    'type': 'randomTwo',
+    type: 'randomTwo',
     gid: 1863447477,
-    'range': 'A2:A',
-    time: {
-      read: 1/4, // 15 sec
-      execute: 1 // 60 sec
-    }
+    range: 'A2:A',
   },
   'addition': {
-    'type': 'maths',
+    type: 'maths',
     gid: 730899168,
-    'range': 'G:G',
+    range: 'G:G',
     time: {
       read: 1/4, // 15 sec
-      execute: 1 // 60 sec
+      execute: 1/4 // 60 sec
     }
   },
 };
@@ -158,45 +154,59 @@ function fetchItem(sheet) {
 }
 
 function humanTime(time) {
+  if (time < 0) {
+    return '∞';
+  }
+
   if (time < 60) {
     return `${time} s`;
   }
 
-  const min = Math.round(time / 60);
+  const min = Math.floor(time / 60);
   const sec = time - (60 * min);
   const secHuman = sec !== 0 ? humanTime(sec) : '';
-
 
   return `${min} min ${secHuman}`;
 }
 
 function startTimer() {
+  const el = document.querySelector('.timer');
   if (!sheet.hasOwnProperty('time')) {
+    el.style.display = 'none';
     return;
   }
+  el.style.removeProperty('display');
 
-  const read = sheet.time.read * 60;
-  const exec = sheet.time.execute * 60;
-
-  let el = document.querySelector('.timer');
-  let parent = el.parentNode;
-  let cloned = el.cloneNode(true);
+  const parent = el.parentNode;
+  const cloned = el.cloneNode(true);
   parent.replaceChild(cloned, el);
 
+  let read = sheet.time.read * 60;
+  let exec = sheet.time.execute * 60;
 
   cloned.dataset.read = humanTime(read);
   cloned.dataset.execute = humanTime(exec);
 
+  if (sheet.time.execute < 0) {
+    exec = 3;
+  }
+
   cloned.style.setProperty('--read', read + 's');
   cloned.style.setProperty('--execute', exec + 's');
 
-  let clonedCl = cloned.classList;
-  let beetRootCl = cloned.querySelector('.beetroot').classList;
-  clonedCl.remove(...['execute', 'read']);
-  beetRootCl.remove('shake');
+  const beetRootCl = cloned.querySelector('.beetroot').classList;
+  const clonedCl = cloned.classList;
 
-  pause(1000).then(() => clonedCl.add('read'));
-  pause(read * 1000).then(() => clonedCl.replace('read', 'execute'));
+  clonedCl.remove(...['execute', 'read']);
+  beetRootCl.remove(...['shake', 'fade']);
+
+  pause(100).then(() => clonedCl.add('read'));
+  pause(read * 1000).then(() => {
+    clonedCl.replace('read', 'execute')
+    if (sheet.time.execute < 0) {
+      beetRootCl.add('fade');
+    }
+  });
   pause((read + exec) * 1000 ).then(() => beetRootCl.add('shake'));
 }
 
