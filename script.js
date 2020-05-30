@@ -45,7 +45,7 @@ const mapping = {
   'words': {
     type: 'randomTwo',
     gid: 1863447477,
-    range: 'A2:A',
+    range: 'A2:A'
   },
   'addition': {
     type: 'maths',
@@ -245,7 +245,6 @@ function makeLinks(e) {
 
   if (e && e.target) {
     sub = '';
-    console.log('here ');
   }
 
   if (!hash()) {
