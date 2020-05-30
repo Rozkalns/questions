@@ -1,10 +1,13 @@
-const converter = new showdown.Converter();
 const reloadButton = document.querySelector( '.reload' );
-const reloadSvg = document.querySelector( 'svg' );
-const question = document.getElementById('question');
+const reloadSvg = reloadButton.querySelector( 'svg' );
+const questionContainer = document.getElementById('question');
+const question = document.getElementById('content');
 const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
 const home = document.querySelector('.home');
+const initialTitle = question.innerText;
+
+const converter = new showdown.Converter();
 
 let sub = '';
 let lesson = '';
@@ -12,27 +15,47 @@ let sheet = {};
 
 const mapping = {
   'interview12': {
-    'gid': 165972876
-  }, // grade 12, 10/60
+    gid: 165972876,
+    time: {
+      read: 1/4, // 15 sec
+      execute: 1 // 60 sec
+    }
+  },
   'monologue12': {
-    'gid': 606603779
-  } , // grade 12 120/300
+    gid: 606603779,
+    time: {
+      read: 2, // 120 sec
+      execute: 5 // 300 sec
+    }
+  } ,
   'dialogue9': {
-    'gid': 361983600
-  }, // grade 9 60/420
+    gid: 361983600,
+    time: {
+      read: 1.5, // 90 sec
+      execute: -1 // 420 sec
+    }
+  },
   'interview9': {
-    'gid': 1311882750
-  }, // grade 10/60
+    gid: 1311882750,
+    time: {
+      read: 1/4, // 15 sec
+      execute: 1 // 60 sec
+    }
+  },
   'words': {
-    'type': 'randomTwo',
-    'gid': 1863447477,
-    'range': 'A2:A'
-  }, // grade 10/60
+    type: 'randomTwo',
+    gid: 1863447477,
+    range: 'A2:A'
+  },
   'addition': {
-    'type': 'maths',
-    'gid': 730899168,
-    'range': 'G:G'
-  }, // grade 10/60
+    type: 'maths',
+    gid: 730899168,
+    range: 'G:G',
+    time: {
+      read: 1/4, // 15 sec
+      execute: 1/4 // 60 sec
+    }
+  },
 };
 
 const levels = {
@@ -66,7 +89,7 @@ String.prototype.capitalize = function() {
 
 function reload() {
   reloadClick();
-  pause(200).then(write);
+  pause(500).then(write);
 }
 
 function reloadClick() {
@@ -76,26 +99,27 @@ function reloadClick() {
   reloadSvg.style.MozTransform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
   reloadSvg.style.transform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
   
-  question.style.opacity = '0';
+  questionContainer.style.opacity = '0';
 }
 
 function fetchClass() {
-  question.classList.add(lesson = hash() || 'home');
-  if (this.className === 'home') {
-    lesson = 'home';
+  if (!hash()) {
+    makeLinks();
+    return;
   }
 
-  if (Object.keys(mapping).includes(lesson)) {
+  if (Object.keys(mapping).includes(lesson = hash())) {
     question.innerText = '🔭';
-    fetchItem(sheet = mapping[lesson]);
-    pause(1).then(() => reloadButton.classList.add('active'));
 
+    fetchItem(sheet = mapping[lesson])
+      .then(() => {
+        if (hash()) {
+          questionContainer.className = lesson
+        }
+      });
+    pause(1).then(() => reloadButton.classList.add('active'));
     links.style.display = 'none';
     links.innerHTML = '';
-  } else {
-    question.innerText = 'English Grooves';
-    sub = '';
-    makeLinks();
   }
 }
 
@@ -105,26 +129,85 @@ function fetchItem(sheet) {
     return;
   }
 
-  if (!hash().length) {
+  if (!hash()) {
     return;
   }
-
-  question.classList.toggle('home');
 
   let url = `https://docs.google.com/spreadsheets/d/1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ/export?exportFormat=csv&single=true`;
   url += sheet.hasOwnProperty('gid') ? `&gid=${sheet.gid}` : '';
   url += sheet.hasOwnProperty('range') ? `&range=${sheet.range}` : '';
 
-  fetch(url).then(function(response){
+  return fetch(url).then(function(response){
       return response.text();
     })
     .then(function(text){
+      if (!hash()) {
+        return;
+      }
       array = text.match(/[^\r\n]+/g).map(t => t.unquoted());
       write();
     })
     .catch(function(err){
+      question.innerHTML = 'Unfortunately an error occurred...';
       console.log(err);  
     });
+}
+
+function humanTime(time) {
+  if (time < 0) {
+    return '∞';
+  }
+
+  if (time < 60) {
+    return `${time} s`;
+  }
+
+  const min = Math.floor(time / 60);
+  const sec = time - (60 * min);
+  const secHuman = sec !== 0 ? humanTime(sec) : '';
+
+  return `${min} min ${secHuman}`;
+}
+
+function startTimer() {
+  const el = document.querySelector('.timer');
+  if (!sheet.hasOwnProperty('time')) {
+    el.style.display = 'none';
+    return;
+  }
+  el.style.removeProperty('display');
+
+  const parent = el.parentNode;
+  const cloned = el.cloneNode(true);
+  parent.replaceChild(cloned, el);
+
+  let read = sheet.time.read * 60;
+  let exec = sheet.time.execute * 60;
+
+  cloned.dataset.read = humanTime(read);
+  cloned.dataset.execute = humanTime(exec);
+
+  if (sheet.time.execute < 0) {
+    exec = 3;
+  }
+
+  cloned.style.setProperty('--read', read + 's');
+  cloned.style.setProperty('--execute', exec + 's');
+
+  const beetRootCl = cloned.querySelector('.beetroot').classList;
+  const clonedCl = cloned.classList;
+
+  clonedCl.remove(...['execute', 'read']);
+  beetRootCl.remove(...['shake', 'fade']);
+
+  pause(100).then(() => clonedCl.add('read'));
+  pause(read * 1000).then(() => {
+    clonedCl.replace('read', 'execute')
+    if (sheet.time.execute < 0) {
+      beetRootCl.add('fade');
+    }
+  });
+  pause((read + exec) * 1000 ).then(() => beetRootCl.add('shake'));
 }
 
 function write() {
@@ -150,13 +233,19 @@ function write() {
         break;
     }
   }
-  
-  question.style.opacity = '1';
+
+  startTimer();
+
+  questionContainer.style.opacity = '1';
   question.innerHTML = text;
 }
 
-function makeLinks() {
+function makeLinks(e) {
   resetToInitialState();
+
+  if (e && e.target) {
+    sub = '';
+  }
 
   if (!hash()) {
     if (!sub.length) {
@@ -188,8 +277,9 @@ function makeLinks() {
 }
 
 function resetToInitialState() {
+  questionContainer.className = 'home';
+  question.innerText = initialTitle;
   links.innerHTML = '';
-  question.className = 'home';
 
   if (!hash()) {
     reloadButton.classList.remove('active')
@@ -197,7 +287,8 @@ function resetToInitialState() {
 }
 
 function hash() {
-  return window.location.hash.replace(/^#/, '');
+  const hash = window.location.hash.replace(/^#/, '');
+  return !!hash.length && hash;
 }
 
 function isHash(value) {
@@ -216,7 +307,7 @@ function pickRandomWords(words) {
   for (let i = 0; words > i; i++) {
     indexes.push(Math.floor(Math.random() * wordCount));
   }
-  return indexes.map(i => array[i]).join('<span class="beetroot"></span>');
+  return indexes.map(i => array[i]).join('<span class="words beetroot"></span>');
 }
 
 function pickText() {
@@ -246,7 +337,39 @@ function pickText() {
   return converter.makeHtml(pickedLine);
 }
 
+
+const makeCancelable = promise => {
+  let rejectFn;
+
+  const wrappedPromise = new Promise((resolve, reject) => {
+    rejectFn = reject;
+
+    Promise.resolve(promise)
+      .then(resolve)
+      .catch(reject);
+  });
+
+  wrappedPromise.cancel = () => {
+    rejectFn({ canceled: true });
+  };
+
+  return wrappedPromise;
+};
+
 const pause = time => new Promise(resolve => setTimeout(resolve, time))
+const debounce = (f, interval) => {
+  let timer = null;
+
+  return (...args) => {
+    clearTimeout(timer);
+    return new Promise((resolve) => {
+      timer = setTimeout(
+        () => resolve(f(...args)),
+        interval,
+      );
+    });
+  };
+}
 const isTopicName = t => t.toUpperCase() === t;
 
 function updateGA() {
@@ -256,10 +379,14 @@ function updateGA() {
 }
 
 // Events
-fetchClass();
+if (hash()) {
+  fetchClass();
+} else {
+  makeLinks();
+}
 window.addEventListener("hashchange", updateGA);
 window.addEventListener("hashchange", fetchClass);
-home.addEventListener("click", fetchClass, false);
+home.addEventListener("click", makeLinks, false);
 reloadButton.addEventListener('click', reload);
 support.addEventListener('click', (el) => {
     el.target.classList.add('expand')

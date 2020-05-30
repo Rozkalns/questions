@@ -35,6 +35,126 @@ main {
     height: 20vh;
 }
 
+.timer {
+  display: none;
+  position: relative;
+  border-left: 1px solid #bebebe;
+  border-right: 1px solid #bebebe;
+
+  flex-basis: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+#question:not(.home) .timer {
+  display: flex;
+}
+
+.timer:before {
+  font-size: 20px;
+  position: absolute;
+  display: block;
+  top: 4px;
+  left: 4px;
+}
+
+.timer.read:before {
+  content: 'Prepare ' attr(data-read);
+}
+
+.timer.execute:before {
+  content: 'Speak ' attr(data-execute);
+}
+
+.timer .push {
+  flex-grow: 1;
+}
+
+.timer.read .push {
+  transition: all var(--read);
+  transition-delay: .9s;
+  flex-grow: 0.001;
+}
+
+.timer.execute .push {
+  transition: all var(--execute) linear;
+}
+
+.timer .beetroot.shake {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+}
+
+.timer .beetroot.fade {
+  transition: opacity var(--execute) ease-out;
+  opacity: 0;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.timer .beetroot {
+  opacity: 1;
+  width: 64px;
+  height: 64px;
+  z-index: 2;
+}
+.timer .beetroot .leaf {
+  animation: grow 2s infinite alternate ease-in-out;
+  transform-origin: bottom;
+  transform-box: fill-box;
+}
+
+.timer .line {
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  height: 1px;
+  background: #bebebe;
+  z-index: 1;
+}
+
+@keyframes grow {
+  from {
+    transform: scale(.6);
+  }
+  to {
+    transform: scale(.9);
+  }
+}
+
+@media (max-width: 500px) {
+  #question #content {
+    margin-top: 40px;
+  }
+  .timer {
+    position: fixed;
+    margin: 0 10px;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .timer .beetroot {
+    width: 42px;
+    height: 42px;
+  }
+}
+
 #question {
   transition: opacity 150ms;
   text-align: center;
@@ -65,7 +185,7 @@ main {
   text-align: left;
 }
 
-#question .beetroot {
+#question .words.beetroot {
   background: url('./assets/beet.svg');
   background-size: cover;
   display: inline-block;
@@ -76,7 +196,7 @@ main {
 }
 
 @media (max-width: 500px) {
-  #question .beetroot {
+  #question .words.beetroot {
     width: 36px;
     height: 36px;
     margin: 0 18px;
