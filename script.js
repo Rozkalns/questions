@@ -4,8 +4,6 @@ const questionContainer = document.getElementById('question');
 const question = document.getElementById('content');
 const support = document.querySelector('.support .btn');
 const links = document.querySelector('.links');
-const timer = document.querySelector('.timer');
-const timerPusher = document.querySelector('.timer .push');
 const home = document.querySelector('.home');
 const initialTitle = question.innerText;
 
@@ -159,7 +157,24 @@ function fetchItem(sheet) {
     });
 }
 
+function humanTime(time) {
+  if (time < 60) {
+    return `${time} s`;
+  }
+
+  const min = Math.round(time / 60);
+  const sec = time - (60 * min);
+  const secHuman = sec !== 0 ? humanTime(sec) : '';
+
+
+  return `${min} min ${secHuman}`;
+}
+
 function startTimer() {
+  if (!sheet.hasOwnProperty('time')) {
+    return;
+  }
+
   const read = sheet.time.read * 60;
   const exec = sheet.time.execute * 60;
 
@@ -168,17 +183,20 @@ function startTimer() {
   let cloned = el.cloneNode(true);
   parent.replaceChild(cloned, el);
 
-  cloned.classList.remove('end');
+
+  cloned.dataset.read = humanTime(read);
+  cloned.dataset.execute = humanTime(exec);
+
   cloned.style.setProperty('--read', read + 's');
   cloned.style.setProperty('--execute', exec + 's');
 
-  let pusherCl = cloned.querySelector('.push').classList;
+  let clonedCl = cloned.classList;
   let beetRootCl = cloned.querySelector('.beetroot').classList;
-  pusherCl.remove(...['execute', 'read']);
+  clonedCl.remove(...['execute', 'read']);
   beetRootCl.remove('shake');
 
-  pause(1000).then(() => pusherCl.add('read'));
-  pause(read * 1000).then(() => pusherCl.replace('read', 'execute'));
+  pause(1000).then(() => clonedCl.add('read'));
+  pause(read * 1000).then(() => clonedCl.replace('read', 'execute'));
   pause((read + exec) * 1000 ).then(() => beetRootCl.add('shake'));
 }
 

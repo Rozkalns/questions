@@ -50,16 +50,32 @@ main {
   display: flex;
 }
 
+.timer:before {
+  font-size: 20px;
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+}
+
+.timer.read:before {
+  content: 'Prepare ' attr(data-read);
+}
+
+.timer.execute:before {
+  content: 'Execute ' attr(data-execute);
+}
+
 .timer .push {
   flex-grow: 1;
 }
 
-.timer .push.read {
+.timer.read .push {
   transition: all var(--read);
   flex-grow: 0.001;
 }
 
-.timer .push.execute {
+.timer.execute .push {
   transition: all var(--execute) linear;
 }
 
