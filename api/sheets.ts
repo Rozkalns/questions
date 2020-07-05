@@ -7,8 +7,13 @@ const SHEET = (range: string): string =>
   `https://sheets.googleapis.com/v4/spreadsheets/${doc}/values/${range}?valueRenderOption=UNFORMATTED_VALUE&majorDimension=COLUMNS&key=${process.env.SHEETS_API}`
 
 const getRange = async (range?: string): Promise<any> => {
-  const res = await fetch(SHEET(range), {})
-  return res.json();
+  try {
+    const response = await fetch(SHEET(range), {});
+    const json = await response.json();
+    return json;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export default async (req: NowRequest, res: NowResponse) => {
@@ -22,5 +27,5 @@ export default async (req: NowRequest, res: NowResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
 
-  res.json(data);
+  res.json(data.values[0]);
 }
