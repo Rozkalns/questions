@@ -1,5 +1,26 @@
+import fetch from 'node-fetch';
 import { NowRequest, NowResponse } from '@vercel/node'
 
-export default (req: NowRequest, res: NowResponse) => {
-  res.json({ name: 'John', email: 'john@example.com' })
+const doc = '1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ';
+
+const SHEET = (range: string): string =>
+  `https://sheets.googleapis.com/v4/spreadsheets/${doc}/values/${range}?valueRenderOption=UNFORMATTED_VALUE&majorDimension=COLUMNS&key=${process.env.SHEETS_API}`
+
+const getRange = async (range?: string): Promise<any> => {
+  const res = await fetch(SHEET(range), {
+    headers: {
+      referer: process.env.VERCEL_URL
+    }
+  });
+  return res.json();
+}
+
+export default async (req: NowRequest, res: NowResponse) => {
+  if (Array.isArray(req.query.range) || !req.query.range) {
+    res.json({ status: 400 });
+    return;
+  }
+
+  const data = await getRange(req.query.range);
+  res.json(data.values[0]);
 }
