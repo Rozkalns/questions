@@ -1,5 +1,5 @@
-const reloadButton = document.querySelector( '.reload' );
-const reloadSvg = reloadButton.querySelector( 'svg' );
+const reloadButton = document.querySelector('.reload');
+const reloadSvg = reloadButton.querySelector('svg');
 const questionContainer = document.getElementById('question');
 const question = document.getElementById('content');
 const support = document.querySelector('.support .btn');
@@ -15,45 +15,45 @@ let sheet = {};
 
 const mapping = {
   'interview12': {
-    gid: 165972876,
+    name: 'interview12',
     time: {
-      read: 1/4, // 15 sec
+      read: 1 / 4, // 15 sec
       execute: 1 // 60 sec
     }
   },
   'monologue12': {
-    gid: 606603779,
+    name: 'monologue12',
     time: {
       read: 2, // 120 sec
       execute: 5 // 300 sec
     }
-  } ,
+  },
   'dialogue9': {
-    gid: 361983600,
+    name: 'dialogue9',
     time: {
       read: 1.5, // 90 sec
       execute: -1 // 420 sec
     }
   },
   'interview9': {
-    gid: 1311882750,
+    name: 'interview9',
     time: {
-      read: 1/4, // 15 sec
+      read: 1 / 4, // 15 sec
       execute: 1 // 60 sec
     }
   },
   'words': {
     type: 'randomTwo',
-    gid: 1863447477,
+    name: 'words',
     range: 'A2:A'
   },
   'addition': {
     type: 'maths',
-    gid: 730899168,
+    name: 'addition',
     range: 'G:G',
     time: {
-      read: 1/4, // 15 sec
-      execute: 1/4 // 60 sec
+      read: 1 / 4, // 15 sec
+      execute: 1 / 4 // 60 sec
     }
   },
 };
@@ -75,15 +75,15 @@ let array = [];
 let rotation = 0;
 
 // Functions
-Array.prototype.diff = function(a) {
-    return this.filter(function(i) {return a.indexOf(i) < 0;});
+Array.prototype.diff = function (a) {
+  return this.filter(function (i) { return a.indexOf(i) < 0; });
 };
 
 String.prototype.unquoted = function () {
-  return this.replace (/(^")|("$)/g, '');
+  return this.replace(/(^")|("$)/g, '');
 }
 
-String.prototype.capitalize = function() {
+String.prototype.capitalize = function () {
   return this.charAt(0).toUpperCase() + this.slice(1)
 }
 
@@ -96,9 +96,9 @@ function reloadClick() {
   rotation -= 180;
 
   reloadSvg.style.webkitTransform = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
-  reloadSvg.style.MozTransform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
-  reloadSvg.style.transform  = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
-  
+  reloadSvg.style.MozTransform = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
+  reloadSvg.style.transform = 'translateZ(0px) rotateZ( ' + rotation + 'deg )';
+
   questionContainer.style.opacity = '0';
 }
 
@@ -133,23 +133,29 @@ function fetchItem(sheet) {
     return;
   }
 
-  let url = `https://docs.google.com/spreadsheets/d/1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ/export?exportFormat=csv&single=true`;
-  url += sheet.hasOwnProperty('gid') ? `&gid=${sheet.gid}` : '';
-  url += sheet.hasOwnProperty('range') ? `&range=${sheet.range}` : '';
 
-  return fetch(url).then(function(response){
-      return response.text();
-    })
-    .then(function(text){
+  const doc = '1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ';
+  const key = 'AIzaSyC8HGNuZ7Mq3NE6tiLwijoXJD-3ckon-Fs';
+
+  let range = `${sheet.name}`
+  range += '!' + (sheet.hasOwnProperty('range') ? `${sheet.range}` : 'A:A');
+
+  let url = `https://sheets.googleapis.com/v4/spreadsheets/${doc}/values/${range}?valueRenderOption=UNFORMATTED_VALUE&majorDimension=COLUMNS&key=${key}`;
+
+
+  return fetch(url).then(function (response) {
+    return response.json();
+  })
+    .then(function (content) {
       if (!hash()) {
         return;
       }
-      array = text.match(/[^\r\n]+/g).map(t => t.unquoted());
+      array = content.values[0];
       write();
     })
-    .catch(function(err){
+    .catch(function (err) {
       question.innerHTML = 'Unfortunately an error occurred...';
-      console.log(err);  
+      console.log(err);
     });
 }
 
@@ -207,7 +213,7 @@ function startTimer() {
       beetRootCl.add('fade');
     }
   });
-  pause((read + exec) * 1000 ).then(() => beetRootCl.add('shake'));
+  pause((read + exec) * 1000).then(() => beetRootCl.add('shake'));
 }
 
 function write() {
@@ -220,7 +226,7 @@ function write() {
       type = sheet.type;
     }
 
-    switch(type) {
+    switch (type) {
       case 'randomTwo':
         text = pickRandomWords(2);
         break;
@@ -317,19 +323,19 @@ function pickText() {
 
   const topics = array.filter(t => t.length && t.toUpperCase() === t);
   const questions = array.diff(topics);
-  const randomQuestionIndex =  Math.floor(Math.random() * questions.length)
-  
+  const randomQuestionIndex = Math.floor(Math.random() * questions.length)
+
   let pickedLine = questions[randomQuestionIndex];
   if (isHash('dialogue9')) {
     pickedLine = pickedLine.replace(/\s\u2022\s/g, "\n- ");
   }
 
   if (topics.length) {
-    const lookupPart = array.slice(0,array.indexOf(pickedLine)).reverse();
+    const lookupPart = array.slice(0, array.indexOf(pickedLine)).reverse();
     const topicIndex = lookupPart.findIndex(isTopicName);
     const topic = lookupPart[topicIndex];
 
-    pickedLine =  `**${topic.trim()}**<br>${pickedLine.trim()}`;
+    pickedLine = `**${topic.trim()}**<br>${pickedLine.trim()}`;
   }
 
   pickedLine += '<div class="breathe"></div>'
@@ -389,6 +395,6 @@ window.addEventListener("hashchange", fetchClass);
 home.addEventListener("click", makeLinks, false);
 reloadButton.addEventListener('click', reload);
 support.addEventListener('click', (el) => {
-    el.target.classList.add('expand')
-    pause(7.5 * 1000).then(() => el.target.classList.remove('expand'))
+  el.target.classList.add('expand')
+  pause(7.5 * 1000).then(() => el.target.classList.remove('expand'))
 });

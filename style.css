@@ -166,6 +166,7 @@ main {
 }
 #question p {
   margin: 0;
+  white-space: pre-line;
 }
 #question .head {
   font-weight: bold;
