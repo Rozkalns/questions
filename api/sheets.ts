@@ -22,5 +22,5 @@ export default async (req: NowRequest, res: NowResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
 
-  res.json(data.values[0]);
+  res.json(data);
 }
