@@ -133,24 +133,17 @@ function fetchItem(sheet) {
     return;
   }
 
-
-  const doc = '1C8wqEI2iXL50fE3CwU5VDS_FZbvOeFy8UwQuhKD7jaQ';
-  const key = 'AIzaSyC8HGNuZ7Mq3NE6tiLwijoXJD-3ckon-Fs';
-
   let range = `${sheet.name}`
   range += '!' + (sheet.hasOwnProperty('range') ? `${sheet.range}` : 'A:A');
 
-  let url = `https://sheets.googleapis.com/v4/spreadsheets/${doc}/values/${range}?valueRenderOption=UNFORMATTED_VALUE&majorDimension=COLUMNS&key=${key}`;
-
-
-  return fetch(url).then(function (response) {
+  return fetch(`/api/sheets/?range=${range}`).then(function (response) {
     return response.json();
   })
     .then(function (content) {
       if (!hash()) {
         return;
       }
-      array = content.values[0];
+      array = content;
       write();
     })
     .catch(function (err) {
