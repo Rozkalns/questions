@@ -1,7 +1,1 @@
-{
-  "build": {
-    "env": {
-      "GOOGLE_SHEETS_API_KEY": "AIzaSyC8HGNuZ7Mq3NE6tiLwijoXJD-3ckon-Fs"
-    }
-  }
-}
+{}
