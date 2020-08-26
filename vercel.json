@@ -1,2 +1,5 @@
 {
+  "routes": [
+    { "src": "/planning-tool", "dest": "plan.html" }
+  ]
 }
