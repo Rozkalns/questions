@@ -92,11 +92,51 @@
       </ul>
     </div>
 
+    <div style="font-size: .7em; opacity: .7">
+      <a href="#" class="admin">admin</a>
+      <form action="./api/reveal" style="display: none" class="form">
+        <input name="try" type="password" placeholder="type secret here..." />
+      </form>
+    </div>
   </div>
 
 </main>
 
 </body>
-<script src=" https://unpkg.com/showdown/dist/showdown.min.js"></script>
+<script src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
+<script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+<script>
+  $( document ).ready(function() {
+    const form = $('form.form');
+
+    $('.admin').on('click', function () {
+      form.show();
+    })
+
+    form.on('submit', function (e) {
+      e.preventDefault();
+      $.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: {
+          try: $('input[name=try]').val(),
+        },
+        success: function(msg) {
+          if (msg.status === 200) {
+            const temp = $(`<a href="${msg.url}">goto template</a>`);
+            console.log(temp[0]);
+            form.append(temp);
+            return;
+          }
+          $('input[name=try]').val('');
+          form.hide()
+          return;
+        }
+      });
+    })
+
+  });
+
+</script>
 
 </html>
