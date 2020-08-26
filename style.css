@@ -398,6 +398,7 @@ header #logo {
   transition: all 0.3s ease 0s;
   border-radius: 4px;
   text-align: center;
+  margin: 2px;
 }
 
 .nav__links li:hover {
@@ -406,4 +407,9 @@ header #logo {
 
 .nav__links li a {
   text-decoration: none;
+}
+
+.nav__links li a.disabled {
+  opacity: .75;
+  cursor: not-allowed;
 }
