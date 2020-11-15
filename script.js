@@ -14,6 +14,22 @@ let lesson = '';
 let sheet = {};
 
 const mapping = {
+  'conversation-sparks-1': {
+    name: 'conversation-sparks-1',
+    title: 'Conversation Sparks A1',
+    time: {
+      read: 1 / 4, // 15 sec
+      execute: 1 // 60 sec
+    }
+  },
+  'conversation-sparks-2': {
+    name: 'conversation-sparks-2',
+    title: 'Conversation Sparks A2',
+    time: {
+      read: 1 / 4, // 15 sec
+      execute: 1 // 60 sec
+    }
+  },
   'interview12': {
     name: 'interview12',
     time: {
@@ -59,16 +75,20 @@ const mapping = {
 };
 
 const levels = {
-  'English B2-C1': [
-    'interview12',
-    'monologue12',
-    'words'
+  'English A1-A2': [
+    'conversation-sparks-1',
+    'conversation-sparks-2'
   ],
   'English B1': [
     'dialogue9',
     'interview9',
     'words'
-  ]
+  ],
+  'English B2-C1': [
+    'interview12',
+    'monologue12',
+    'words'
+  ],
 }
 
 let array = [];
@@ -213,6 +233,11 @@ function write() {
   let text = '';
   if (!array.length) {
     text = 'No groove found...'
+    pause(5000).then(() => {
+      window.location.hash = '#';
+      sub = '';
+      makeLinks()
+    });
   } else {
     let type = 'standard';
     if (sheet.hasOwnProperty('type')) {
@@ -248,7 +273,7 @@ function makeLinks(e) {
 
   if (!hash()) {
     if (!sub.length) {
-      ['English B2-C1', 'English B1'].forEach(i => {
+      Object.keys(levels).forEach(i => {
         let box = document.createElement('div');
         box.addEventListener('click', e => {
           sub = e.target.id;
@@ -259,7 +284,13 @@ function makeLinks(e) {
       });
     } else {
       levels[sub].forEach(function (key) {
-        const human = key.match(/\D+/g).map(i => i.capitalize()).join(' ');
+        let human = '';
+        if (mapping.hasOwnProperty(key) && mapping[key].title) {
+          human = mapping[key].title;
+        } else {
+          human = key.match(/\D+/g).map(i => i.capitalize()).join(' ');
+        }
+
         let copy = document.createElement('span');
 
         let box = document.createElement('div');

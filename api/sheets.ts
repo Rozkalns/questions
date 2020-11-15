@@ -9,10 +9,9 @@ const SHEET = (range: string): string =>
 const getRange = async (range?: string): Promise<any> => {
   try {
     const response = await fetch(SHEET(range), {});
-    const json = await response.json();
-    return json;
+    return await response.json();
   } catch (error) {
-    console.log(error);
+    return await error.error;
   }
 }
 
@@ -27,5 +26,9 @@ export default async (req: NowRequest, res: NowResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
 
+  if (data.hasOwnProperty('error')) {
+    res.statusCode = 404;
+    return res.json({error: 'Data no found'});
+  }
   res.json(data.values[0]);
 }
