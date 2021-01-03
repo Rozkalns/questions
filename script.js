@@ -33,7 +33,7 @@ const mapping = {
     }
   },
   'imagine-if': {
-    type: 'smaller',
+    type: 'smaller no-repeat',
     name: 'imagine-if',
     title: 'Imagine If ...',
     time: {
@@ -116,7 +116,9 @@ levelsFor.grooves = {
 
 const levels = levelsFor[subdomain || 'english'];
 
+let randomQuestionIndex = null;
 let array = [];
+let originalArray = [];
 let rotation = 0;
 
 // Functions
@@ -188,7 +190,7 @@ function fetchItem(sheet) {
       if (!hash()) {
         return;
       }
-      array = content;
+      originalArray = array = content;
       write();
     })
     .catch(function (err) {
@@ -280,6 +282,13 @@ function write() {
       default:
         text = pickText();
         break;
+    }
+
+    if (type.includes('no-repeat')) {
+      array = array.filter((text, index) => index !== randomQuestionIndex)
+      if (!array.length) {
+        array = originalArray
+      }
     }
 
     question.className = type;
@@ -374,7 +383,7 @@ function pickText() {
 
   const topics = array.filter(t => t.length && t.toUpperCase() === t);
   const questions = array.diff(topics);
-  const randomQuestionIndex = Math.floor(Math.random() * questions.length)
+  randomQuestionIndex = Math.floor(Math.random() * questions.length)
 
   let pickedLine = questions[randomQuestionIndex];
   if (isHash('dialogue9')) {
