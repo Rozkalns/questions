@@ -9,6 +9,8 @@ const initialTitle = question.innerText;
 
 const converter = new showdown.Converter();
 
+const subdomain =  window.location.host.split('.')[1] ? window.location.host.split('.')[0] : false;
+
 let sub = '';
 let lesson = '';
 let sheet = {};
@@ -28,6 +30,15 @@ const mapping = {
     time: {
       read: 1 / 4, // 15 sec
       execute: 1 // 60 sec
+    }
+  },
+  'imagine-if': {
+    type: 'smaller',
+    name: 'imagine-if',
+    title: 'Imagine If ...',
+    time: {
+      read: 1 / 2, // 30 sec
+      execute: 1 / 2 // 30 sec
     }
   },
   'interview12': {
@@ -74,10 +85,13 @@ const mapping = {
   },
 };
 
-const levels = {
+let levelsFor = {};
+
+levelsFor.english = {
   'English A1-A2': [
     'conversation-sparks-1',
-    'conversation-sparks-2'
+    'conversation-sparks-2',
+    // 'testing'
   ],
   'English B1': [
     'dialogue9',
@@ -90,6 +104,17 @@ const levels = {
     'words'
   ],
 }
+
+levelsFor.grooves = {
+  'Games': [
+    'imagine-if',
+  ],
+  'Chemistry': [
+    // 'testing',
+  ],
+}
+
+const levels = levelsFor[subdomain || 'english'];
 
 let array = [];
 let rotation = 0;
@@ -256,6 +281,8 @@ function write() {
         text = pickText();
         break;
     }
+
+    question.className = type;
   }
 
   startTimer();
