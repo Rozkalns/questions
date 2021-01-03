@@ -17,6 +17,7 @@ let sheet = {};
 
 const mapping = {
   'conversation-sparks-1': {
+    type: 'no-repeat',
     name: 'conversation-sparks-1',
     title: 'Conversation Sparks A1',
     time: {
@@ -25,6 +26,7 @@ const mapping = {
     }
   },
   'conversation-sparks-2': {
+    type: 'no-repeat',
     name: 'conversation-sparks-2',
     title: 'Conversation Sparks A2',
     time: {
