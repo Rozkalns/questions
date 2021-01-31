@@ -439,3 +439,19 @@ header #logo {
   opacity: .75;
   cursor: not-allowed;
 }
+
+.picker {
+  display: flex;
+}
+
+.picker input {
+  font-size: 20px;
+  padding: 4px 12px;
+  font-family: monospace;
+}
+
+.picker button {
+  margin-left: 12px;
+  font-size: 20px;
+  padding: 4px;
+}

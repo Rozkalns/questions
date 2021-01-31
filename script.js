@@ -34,6 +34,11 @@ const mapping = {
       execute: 1 // 60 sec
     }
   },
+  'roles-identity': {
+    type: 'picker',
+    name: 'roles-identity',
+    title: 'Identity',
+  },
   'imagine-if': {
     type: 'smaller no-repeat',
     name: 'imagine-if',
@@ -113,6 +118,9 @@ levelsFor.grooves = {
   ],
   'Chemistry': [
     // 'testing',
+  ],
+  'Roles': [
+    'roles-identity',
   ],
 }
 
@@ -260,6 +268,7 @@ function startTimer() {
 
 function write() {
   let text = '';
+  let type = 'standard';
   if (!array.length) {
     text = 'No groove found...'
     pause(5000).then(() => {
@@ -268,17 +277,19 @@ function write() {
       makeLinks()
     });
   } else {
-    let type = 'standard';
     if (sheet.hasOwnProperty('type')) {
       type = sheet.type;
     }
 
     switch (type) {
+      case 'picker':
+        text = picker();
+        break;
       case 'randomTwo':
         text = pickRandomWords(2);
         break;
       case 'maths':
-        text = pickRandom();
+        text = pickAt();
         break;
       case 'standard':
       default:
@@ -297,8 +308,11 @@ function write() {
   }
 
   startTimer();
-
   questionContainer.style.opacity = '1';
+
+  if (['picker'].includes(type)) {
+    return;
+  }
   question.innerHTML = text;
 }
 
@@ -363,10 +377,13 @@ function isHash(value) {
   return hash() === value;
 }
 
-function pickRandom() {
+function pickAt(number) {
   const wordCount = array.length;
-  const index = Math.floor(Math.random() * wordCount);
-  return array[index];
+  if (number !== null) {
+    return array[(Math.abs(number) - 1) % wordCount];
+  } else {
+    return array[Math.floor(Math.random() * wordCount)]
+  }
 }
 
 function pickRandomWords(words) {
@@ -376,6 +393,29 @@ function pickRandomWords(words) {
     indexes.push(Math.floor(Math.random() * wordCount));
   }
   return indexes.map(i => array[i]).join('<span class="words beetroot"></span>');
+}
+
+function picker () {
+  const wrap = document.createElement('div');
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.pattern = '[0-9]'
+  input.name ='index'
+  input.placeholder = 'type the number';
+
+  const btn = document.createElement('button');
+  btn.innerHTML = 'OK';
+
+  btn.addEventListener('click', function () {
+    question.innerHTML = pickAt(input.value.match('/\d.+/'));
+  })
+
+  wrap.appendChild(input);
+  wrap.appendChild(btn);
+
+  question.innerHTML = '';
+  question.appendChild(wrap);
 }
 
 function pickText() {
