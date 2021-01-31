@@ -400,7 +400,6 @@ function picker () {
 
   const input = document.createElement('input');
   input.type = 'number';
-  input.pattern = '[0-9]'
   input.name ='index'
   input.placeholder = 'type the number';
 
@@ -408,7 +407,8 @@ function picker () {
   btn.innerHTML = 'OK';
 
   btn.addEventListener('click', function () {
-    question.innerHTML = pickAt(input.value.match('/\d.+/'));
+    const number = input.value.match(/\d+/g).join('') * 1;
+    question.innerHTML = pickAt(number);
   })
 
   wrap.appendChild(input);
