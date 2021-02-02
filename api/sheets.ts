@@ -24,7 +24,7 @@ export default async (req: NowRequest, res: NowResponse) => {
   const data = await getRange(req.query.range);
 
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
 
   if (data.hasOwnProperty('error')) {
     res.statusCode = 404;
