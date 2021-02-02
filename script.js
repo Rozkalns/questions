@@ -39,6 +39,11 @@ const mapping = {
     name: 'roles-identity',
     title: 'Identity',
   },
+  'celebrities': {
+    type: 'picker',
+    name: 'celebrities',
+    title: 'Celebrities',
+  },
   'imagine-if': {
     type: 'smaller no-repeat',
     name: 'imagine-if',
@@ -121,6 +126,7 @@ levelsFor.grooves = {
   ],
   'Roles': [
     'roles-identity',
+    // 'celebrities',
   ],
 }
 
@@ -398,6 +404,9 @@ function pickRandomWords(words) {
 function picker () {
   const wrap = document.createElement('div');
 
+  const heading = document.createElement('h2');
+  heading.innerHTML = sheet.title;
+
   const input = document.createElement('input');
   input.type = 'number';
   input.name ='index'
@@ -411,6 +420,7 @@ function picker () {
     question.innerHTML = pickAt(number);
   })
 
+  wrap.appendChild(heading);
   wrap.appendChild(input);
   wrap.appendChild(btn);
 
