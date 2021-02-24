@@ -39,6 +39,11 @@ const mapping = {
     name: 'roles-identity',
     title: 'Identity',
   },
+  'roles-after-the-dark': {
+    type: 'picker',
+    name: 'roles-after-dark',
+    title: 'After the Dark',
+  },
   'celebrities': {
     type: 'picker',
     name: 'celebrities',
@@ -126,6 +131,7 @@ levelsFor.grooves = {
   ],
   'Roles': [
     'roles-identity',
+    'roles-after-the-dark',
     // 'celebrities',
   ],
 }
